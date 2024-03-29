@@ -10,7 +10,7 @@ import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity
 import { TCriteria } from '../types'
 import { PaginationProps } from './pagination-props.interface'
 
-export interface BaseRepositoryInterface<T> {
+export interface IBaseRepository<T> {
     create(data: DeepPartial<T>): T
     createMany(data: Array<DeepPartial<T>>): Array<T>
     save(data: DeepPartial<T>): Promise<T>

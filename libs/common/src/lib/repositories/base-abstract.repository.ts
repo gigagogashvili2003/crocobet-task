@@ -1,10 +1,9 @@
 import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, Repository, SelectQueryBuilder } from 'typeorm'
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity'
-import { BaseRepositoryInterface } from '../interfaces/base-repository.interface'
-import { HasId, PaginationProps } from '../interfaces'
+import { HasId, IBaseRepository, PaginationProps } from '../interfaces'
 import { TCriteria } from '../types'
 
-export abstract class BaseAbstractRepository<T extends HasId> implements BaseRepositoryInterface<T> {
+export abstract class BaseAbstractRepository<T extends HasId> implements IBaseRepository<T> {
     private entity: Repository<T>
 
     public constructor(entity: Repository<T>) {

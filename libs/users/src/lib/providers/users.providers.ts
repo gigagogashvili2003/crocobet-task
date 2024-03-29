@@ -1,5 +1,9 @@
 import { Provider } from '@nestjs/common'
-import { USERS_SERVICE } from '../constants'
 import { UsersService } from '../services'
+import { USER_REPOSITORY, USER_SERVICE } from '../constants'
+import { UserRepository } from '../repositories'
 
-export const usersProviders: Array<Provider> = [{ provide: USERS_SERVICE, useClass: UsersService }]
+export const usersProviders: Array<Provider> = [
+    { provide: USER_SERVICE, useClass: UsersService },
+    { provide: USER_REPOSITORY, useClass: UserRepository },
+]
