@@ -65,6 +65,12 @@
       ],
       "@app/books/*": [
         "libs/books/src/*"
+      ],
+      "@app/db": [
+        "libs/db/src"
+      ],
+      "@app/db/*": [
+        "libs/db/src/*"
       ]
     }
   }

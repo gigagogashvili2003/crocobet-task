@@ -26,6 +26,8 @@
     "@app/sessions/(.*)": "<rootDir>/../libs/sessions/src/$1",
     "@app/sessions": "<rootDir>/../libs/sessions/src",
     "@app/books/(.*)": "<rootDir>/../libs/books/src/$1",
-    "@app/books": "<rootDir>/../libs/books/src"
+    "@app/books": "<rootDir>/../libs/books/src",
+    "@app/db/(.*)": "<rootDir>/../libs/db/src/$1",
+    "@app/db": "<rootDir>/../libs/db/src"
   }
 }
