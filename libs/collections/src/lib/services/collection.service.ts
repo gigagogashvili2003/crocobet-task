@@ -7,6 +7,7 @@ import { IUser } from '@app/users/lib/interfaces';
 import { CollectionAlreadyExistsException, CollectionNotFoundException } from '@app/common/lib/exceptions';
 import { PromiseGenericResponse } from '@app/common/lib/types';
 import { UTILS_SERVICE, UtilsService } from '@app/utils';
+import { CollectionResponseEntity } from '../response-entities';
 
 @Injectable()
 export class CollectionService {
@@ -60,6 +61,18 @@ export class CollectionService {
         return { status: HttpStatus.OK, message: 'Collection has updated!' };
     }
 
+    public async findAllCollection(currentUser: IUser): PromiseGenericResponse<{ collections: Array<ICollection> }> {
+        const collections = await this.findAll(currentUser);
+
+        const serializedCollections = this.serializeCollections(collections);
+
+        return { status: HttpStatus.OK, body: { collections: serializedCollections } };
+    }
+
+    public serializeCollections(collections: Array<ICollection>) {
+        return collections.map((collection) => new CollectionResponseEntity(collection));
+    }
+
     public deleteByUser(id: number, user: IUser) {
         return this.collectionRepository.delete({ id, user });
     }
@@ -79,5 +92,9 @@ export class CollectionService {
 
     public update(id: number, user: IUser, collection: Partial<ICollection>) {
         return this.collectionRepository.update({ id, user }, collection);
+    }
+
+    public findAll(user: IUser) {
+        return this.collectionRepository.findAll({ where: { user } });
     }
 }
