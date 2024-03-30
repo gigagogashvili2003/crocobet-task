@@ -1,3 +1,6 @@
+import { BookPage } from '@app/book-pages/lib/entities';
+import { Book } from '@app/books/lib/entities';
+import { CollectionBook } from '@app/collection-books/lib/entities';
 import { Collection } from '@app/collections';
 import { Session } from '@app/sessions/lib/entities';
 import { User } from '@app/users/lib/entities';
@@ -13,7 +16,7 @@ export const getDatabaseConfig = async (configService: ConfigService): Promise<T
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_NAME'),
         // entities: ['dist/**/*.entity.js'],
-        entities: [Session, User, Collection],
+        entities: [Session, User, Collection, Book, BookPage, CollectionBook],
         synchronize: true,
     };
 };

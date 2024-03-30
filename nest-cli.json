@@ -99,6 +99,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/notifications/tsconfig.lib.json"
       }
+    },
+    "book-pages": {
+      "type": "library",
+      "root": "libs/book-pages",
+      "entryFile": "index",
+      "sourceRoot": "libs/book-pages/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/book-pages/tsconfig.lib.json"
+      }
+    },
+    "collection-books": {
+      "type": "library",
+      "root": "libs/collection-books",
+      "entryFile": "index",
+      "sourceRoot": "libs/collection-books/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/collection-books/tsconfig.lib.json"
+      }
     }
   }
 }
