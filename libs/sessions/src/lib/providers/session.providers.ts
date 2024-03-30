@@ -1,9 +1,9 @@
-import { Provider } from '@nestjs/common'
-import { SESSIONS_REPOSITORY, SESSIONS_SERVICE } from '../constants'
-import { SessionRepository } from '../repositories'
-import { SessionsService } from '../services'
+import { Provider } from '@nestjs/common';
+import { SessionRepository } from '../repositories';
+import { SESSION_REPOSITORY, SESSION_SERVICE } from '../constants';
+import { SessionService } from '../services';
 
 export const sessionProviders: Array<Provider> = [
-    { provide: SESSIONS_REPOSITORY, useClass: SessionRepository },
-    { provide: SESSIONS_SERVICE, useClass: SessionsService },
-]
+    { provide: SESSION_REPOSITORY, useClass: SessionRepository },
+    { provide: SESSION_SERVICE, useClass: SessionService },
+];

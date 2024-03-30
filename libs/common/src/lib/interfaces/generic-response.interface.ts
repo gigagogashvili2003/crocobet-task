@@ -1,7 +1,7 @@
-import { HttpStatus } from '@nestjs/common'
+import { HttpStatus } from '@nestjs/common';
 
 export interface GenericResponse<B = null> {
-    message: string
-    status: HttpStatus
-    body?: B
+    message?: string;
+    status: HttpStatus;
+    body?: B;
 }
