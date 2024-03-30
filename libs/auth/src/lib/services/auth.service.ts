@@ -1,4 +1,4 @@
-import { JwtPayloadInterface, Token } from '@app/common';
+import { GenericResponse, JwtPayloadInterface, Token } from '@app/common';
 import {
     InvalidOtpException,
     OtpNotFoundException,
@@ -118,6 +118,12 @@ export class AuthService {
         ]);
 
         return { status: HttpStatus.OK, message: 'Your account has verified!' };
+    }
+
+    public me(currentUser: IUser): GenericResponse<{ user: IUser }> {
+        const serializedUser = this.userService.serialize(currentUser);
+
+        return { status: HttpStatus.OK, body: { user: serializedUser } };
     }
 
     public signTokens(payload: JwtPayloadInterface): Promise<[string, string]> {
