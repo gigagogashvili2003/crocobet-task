@@ -4,7 +4,10 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "webpack": true
+    "webpack": true,
+    "plugins": [
+      "@nestjs/swagger/plugin"
+    ]
   },
   "projects": {
     "users": {
@@ -86,6 +89,15 @@
       "sourceRoot": "libs/db/src",
       "compilerOptions": {
         "tsConfigPath": "libs/db/tsconfig.lib.json"
+      }
+    },
+    "notifications": {
+      "type": "library",
+      "root": "libs/notifications",
+      "entryFile": "index",
+      "sourceRoot": "libs/notifications/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/notifications/tsconfig.lib.json"
       }
     }
   }
