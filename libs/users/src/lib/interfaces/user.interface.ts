@@ -5,4 +5,5 @@ export interface IUser extends IDate {
     name: string;
     email: string;
     password: string;
+    verified: boolean;
 }

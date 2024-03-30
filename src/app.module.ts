@@ -13,6 +13,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { NotificationsModule } from '@app/notifications';
+import { CollectionsModule } from './collections/collections.module';
 
 @Module({
     imports: [
@@ -28,6 +30,8 @@ import { JwtModule } from '@nestjs/jwt';
         SessionsModule,
         AuthModule,
         UsersModule,
+        NotificationsModule,
+        CollectionsModule,
     ],
     controllers: [AppController],
     providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

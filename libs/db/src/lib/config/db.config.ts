@@ -1,7 +1,8 @@
-import { Session } from '@app/sessions/lib/entities'
-import { User } from '@app/users/lib/entities'
-import { ConfigService } from '@nestjs/config'
-import { TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { Collection } from '@app/collections';
+import { Session } from '@app/sessions/lib/entities';
+import { User } from '@app/users/lib/entities';
+import { ConfigService } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export const getDatabaseConfig = async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
     return {
@@ -12,7 +13,7 @@ export const getDatabaseConfig = async (configService: ConfigService): Promise<T
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_NAME'),
         // entities: ['dist/**/*.entity.js'],
-        entities: [Session, User],
+        entities: [Session, User, Collection],
         synchronize: true,
-    }
-}
+    };
+};

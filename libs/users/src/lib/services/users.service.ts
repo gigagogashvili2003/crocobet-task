@@ -18,4 +18,8 @@ export class UsersService {
         const newUser = this.userRepository.create(user);
         return this.userRepository.save(newUser);
     }
+
+    public updateById(id: number, data: Partial<IUser>) {
+        return this.userRepository.update({ id }, data);
+    }
 }

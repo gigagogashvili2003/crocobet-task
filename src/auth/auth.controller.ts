@@ -1,25 +1,14 @@
 import { AuthService } from '@app/auth';
 import { AUTH_SERVICE } from '@app/auth/lib/constants';
-import { RefreshTokenDto, SignInDto, VerifyDto } from '@app/auth/lib/dtos';
-import { RefreshTokenSchema, VerifySchema } from '@app/auth/lib/schemas';
+import { VerifyDto } from '@app/auth/lib/dtos';
+import { VerifySchema } from '@app/auth/lib/schemas';
 import { AccessTokenGuard, LocalGuard, RefreshTokenGuard } from '@app/common';
 import { CurrentUser } from '@app/common/lib/decorators';
 import { JoiValidationPipe } from '@app/common/lib/pipes';
 import { CreateUserSchema } from '@app/users';
 import { CreateUserDto } from '@app/users/lib/dtos';
 import { IUser } from '@app/users/lib/interfaces';
-import {
-    Body,
-    Controller,
-    HttpCode,
-    HttpStatus,
-    Inject,
-    Patch,
-    Post,
-    Query,
-    UseGuards,
-    UsePipes,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Patch, Post, UseGuards, UsePipes } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -46,7 +35,6 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('refresh-token')
     @UseGuards(RefreshTokenGuard)
-    // @UsePipes(new JoiValidationPipe(RefreshTokenSchema))
     public refreshToken(@CurrentUser() currentUser: IUser) {
         return this.authService.refreshToken(currentUser);
     }
@@ -61,7 +49,13 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @UseGuards(AccessTokenGuard)
     @Patch('verify')
-    public verify(@CurrentUser() currentUser: IUser, @Query(new JoiValidationPipe(VerifySchema)) params: VerifyDto) {
-        return this.authService.verify(currentUser, params.otp);
+    public verify(@Body(new JoiValidationPipe(VerifySchema)) verifyDto: VerifyDto, @CurrentUser() currentUser: IUser) {
+        return this.authService.verify(currentUser, verifyDto.code);
+    }
+
+    @Get('me')
+    @UseGuards(AccessTokenGuard)
+    public me(@CurrentUser() currentUser: IUser) {
+        return currentUser;
     }
 }

@@ -29,6 +29,7 @@
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.1.2",
     "@nestjs/typeorm": "^10.0.2",
+    "aws-sdk": "^2.1589.0",
     "bcrypt": "^5.1.1",
     "ioredis": "^5.3.2",
     "joi": "^17.12.2",
@@ -95,7 +96,8 @@
       "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@app/sessions(|/.*)$": "<rootDir>/libs/sessions/src/$1",
       "^@app/books(|/.*)$": "<rootDir>/libs/books/src/$1",
-      "^@app/db(|/.*)$": "<rootDir>/libs/db/src/$1"
+      "^@app/db(|/.*)$": "<rootDir>/libs/db/src/$1",
+      "^@app/notifications(|/.*)$": "<rootDir>/libs/notifications/src/$1"
     }
   }
 }

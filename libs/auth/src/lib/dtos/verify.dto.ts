@@ -1,3 +1,3 @@
 export class VerifyDto {
-    readonly otp: number;
+    readonly code: number;
 }
