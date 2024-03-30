@@ -1,7 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { COLLECTION_REPOSITORY } from '../constants';
-import { CollectionRepository } from '../repositories';
-import { ICollection } from '../interfaces';
+import { ICollection, ICollectionRepository } from '../interfaces';
 import { CreateCollectionDto, UpdateCollectionDto } from '../dtos';
 import { IUser } from '@app/users/lib/interfaces';
 import { CollectionAlreadyExistsException, CollectionNotFoundException } from '@app/common/lib/exceptions';
@@ -12,7 +11,7 @@ import { CollectionResponseEntity } from '../response-entities';
 @Injectable()
 export class CollectionService {
     public constructor(
-        @Inject(COLLECTION_REPOSITORY) private readonly collectionRepository: CollectionRepository,
+        @Inject(COLLECTION_REPOSITORY) private readonly collectionRepository: ICollectionRepository,
         @Inject(UTILS_SERVICE) private readonly utilsService: UtilsService,
     ) {}
 

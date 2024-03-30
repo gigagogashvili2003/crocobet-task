@@ -1,4 +1,8 @@
-import { IBaseRepository } from '@app/common';
-import { BookPage } from '../entities';
+import { IBook } from '@app/books/lib/interfaces';
+import { IDate } from '@app/common';
 
-export interface IBookPage extends IBaseRepository<BookPage> {}
+export interface IBookPage extends IDate {
+    id: number;
+    content: string;
+    book: IBook;
+}

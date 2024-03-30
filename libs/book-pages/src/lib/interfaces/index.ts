@@ -1,1 +1,1 @@
-export * from './book-page.interface';
+export * from './book-page-repository.interface';

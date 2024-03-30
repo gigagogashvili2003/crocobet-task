@@ -9,3 +9,5 @@ export * from './invalid-otp.exception';
 export * from './collection-already-exists.exception';
 export * from './nan.exception';
 export * from './collection-not-found.exception';
+export * from './book-not-found.exception';
+export * from './book-already-exists.exception';

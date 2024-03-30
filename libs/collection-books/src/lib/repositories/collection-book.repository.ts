@@ -3,10 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseAbstractRepository } from '@app/common';
 import { CollectionBook } from '../entities';
-import { ICollectionBook } from '../interfaces';
+import { ICollectionBookRepository } from '../interfaces';
 
 @Injectable()
-export class CollectionBookRepository extends BaseAbstractRepository<CollectionBook> implements ICollectionBook {
+export class CollectionBookRepository
+    extends BaseAbstractRepository<CollectionBook>
+    implements ICollectionBookRepository
+{
     public constructor(
         @InjectRepository(CollectionBook) private readonly CollectionBookRepository: Repository<CollectionBook>,
     ) {

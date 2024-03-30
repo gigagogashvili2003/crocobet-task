@@ -1,3 +1,4 @@
+import { Book } from '@app/books/lib/entities';
 import { Collection } from '@app/collections';
 import { BaseEntity } from '@app/common';
 import { Column, Entity, OneToMany } from 'typeorm';
@@ -18,4 +19,7 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Collection, (collection) => collection.user)
     collections: Collection[];
+
+    @OneToMany(() => Book, (book) => book.user)
+    books: Book[];
 }

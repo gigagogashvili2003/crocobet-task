@@ -15,6 +15,7 @@ import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { NotificationsModule } from '@app/notifications';
 import { CollectionsModule } from './collections/collections.module';
+import { BooksModule } from './books/books.module';
 
 @Module({
     imports: [
@@ -32,6 +33,7 @@ import { CollectionsModule } from './collections/collections.module';
         UsersModule,
         NotificationsModule,
         CollectionsModule,
+        BooksModule,
     ],
     controllers: [AppController],
     providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

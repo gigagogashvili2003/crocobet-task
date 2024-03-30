@@ -1,7 +1,8 @@
 import { BookPage } from '@app/book-pages/lib/entities';
 import { CollectionBook } from '@app/collection-books/lib/entities';
 import { BaseEntity } from '@app/common';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { User } from '@app/users';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('books')
 export class Book extends BaseEntity {
@@ -10,6 +11,10 @@ export class Book extends BaseEntity {
 
     @OneToMany(() => CollectionBook, (collectionBook) => collectionBook.book)
     collectionBooks: CollectionBook[];
+
+    @ManyToOne(() => User, (user) => user.books)
+    @JoinColumn({ name: 'user_id' })
+    user: User;
 
     @OneToMany(() => BookPage, (page) => page.book, { cascade: true })
     pages: BookPage[];
