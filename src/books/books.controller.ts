@@ -1,5 +1,5 @@
 import { BOOK_SERVICE } from '@app/books/lib/constants';
-import { BookIdDto, CreateBookDto, DeleteBookParamDto } from '@app/books/lib/dtos';
+import { CreateBookDto, DeleteBookParamDto } from '@app/books/lib/dtos';
 import { BookIdSchema, createBookSchema } from '@app/books/lib/schemas';
 import { BookService } from '@app/books/lib/services';
 import { AccessTokenGuard } from '@app/common';

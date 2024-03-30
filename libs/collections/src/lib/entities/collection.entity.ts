@@ -2,11 +2,12 @@ import { CollectionBook } from '@app/collection-books/lib/entities';
 import { BaseEntity } from '@app/common';
 import { User } from '@app/users';
 import { IUser } from '@app/users/lib/interfaces';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 
 @Entity('collections')
+@Unique(['name', 'user'])
 export class Collection extends BaseEntity {
-    @Column({ type: 'varchar', nullable: false, unique: true })
+    @Column({ type: 'varchar', nullable: false })
     name: string;
 
     @ManyToOne(() => User, (user) => user.collections, { onDelete: 'CASCADE' })

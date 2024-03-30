@@ -80,4 +80,14 @@ export class CollectionsController {
     public findAllCollection(@CurrentUser() currentUser: IUser) {
         return this.collectionService.findAllCollection(currentUser);
     }
+
+    @UseInterceptors(ClassSerializerInterceptor)
+    @Get(':id')
+    @UseGuards(AccessTokenGuard)
+    public findCollectionDetails(
+        @Param(new JoiValidationPipe(CollectionIdSchema)) params: CollectionIdDto,
+        @CurrentUser() currentUser: IUser,
+    ) {
+        return this.collectionService.findCollectionDetails(params.id, currentUser);
+    }
 }

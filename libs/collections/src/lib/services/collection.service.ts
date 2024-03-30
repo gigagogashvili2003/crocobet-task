@@ -6,7 +6,7 @@ import { IUser } from '@app/users/lib/interfaces';
 import { CollectionAlreadyExistsException, CollectionNotFoundException } from '@app/common/lib/exceptions';
 import { PromiseGenericResponse } from '@app/common/lib/types';
 import { UTILS_SERVICE, UtilsService } from '@app/utils';
-import { CollectionResponseEntity } from '../response-entities';
+import { CollectionDetailsResponseEntity, CollectionResponseEntity } from '../response-entities';
 
 @Injectable()
 export class CollectionService {
@@ -21,7 +21,8 @@ export class CollectionService {
     ): PromiseGenericResponse<null> {
         const { name } = createCollectionDto;
 
-        const collectionExists = await this.findOneByName(name);
+        console.log(currentUser);
+        const collectionExists = await this.findOneByName(name, currentUser);
 
         if (collectionExists) {
             throw new CollectionAlreadyExistsException();
@@ -68,6 +69,27 @@ export class CollectionService {
         return { status: HttpStatus.OK, body: { collections: serializedCollections } };
     }
 
+    public async findCollectionDetails(
+        id: string,
+        currentUser: IUser,
+    ): PromiseGenericResponse<{ collection: ICollection }> {
+        const numericId = this.utilsService.convertStrTonumber(id);
+
+        const collection = await this.findOneByIdWithRelations(numericId, currentUser);
+
+        if (!collection) {
+            throw new CollectionNotFoundException();
+        }
+
+        const serializedCollection = this.serializeCollectionDetails(collection);
+
+        return { status: HttpStatus.OK, body: { collection: serializedCollection } };
+    }
+
+    public serializeCollectionDetails(collection: ICollection) {
+        return new CollectionDetailsResponseEntity(collection);
+    }
+
     public serializeCollections(collections: Array<ICollection>) {
         return collections.map((collection) => new CollectionResponseEntity(collection));
     }
@@ -76,12 +98,16 @@ export class CollectionService {
         return this.collectionRepository.delete({ id, user });
     }
 
-    public findOneByName(name: string) {
-        return this.collectionRepository.findOneByCondition({ where: { name } });
+    public findOneByName(name: string, user: IUser) {
+        return this.collectionRepository.findOneByCondition({ where: { name, user } });
     }
 
     public findOneById(id: number, user: IUser) {
         return this.collectionRepository.findOneByCondition({ where: { id, user } });
+    }
+
+    public findOneByIdWithRelations(id: number, user: IUser) {
+        return this.collectionRepository.findOneByCondition({ where: { id, user }, relations: { user: true } });
     }
 
     public createAndSave(collection: Partial<ICollection>) {
