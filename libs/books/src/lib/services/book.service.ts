@@ -8,15 +8,20 @@ import { BOOK_PAGE_SERVICE } from '@app/book-pages/lib/constants';
 import { BookPageService } from '@app/book-pages/lib/services';
 import { IBookPage } from '@app/book-pages/lib/interfaces/book-page.interface';
 import { PromiseGenericResponse } from '@app/common/lib/types';
-import { UTILS_SERVICE, UtilsService } from '@app/utils';
+import { PaginationService, UTILS_SERVICE, UtilsService } from '@app/utils';
+import { BookResponseEntity } from '../response-entities';
+import { IPageInfo, PaginationProps, PaginationQueryDto } from '@app/common';
+import { BookDetailsResponseEntity } from '../response-entities/book-details-response.entity';
 
 @Injectable()
-export class BookService {
+export class BookService extends PaginationService<IBook> {
     public constructor(
         @Inject(BOOK_REPOSITORY) private readonly bookRepository: IBookRepository,
         @Inject(BOOK_PAGE_SERVICE) private readonly bookPageService: BookPageService,
         @Inject(UTILS_SERVICE) private readonly utilsService: UtilsService,
-    ) {}
+    ) {
+        super();
+    }
 
     public async createBook(createBookDto: CreateBookDto, currentUser: IUser): PromiseGenericResponse<null> {
         const { name, pages } = createBookDto;
@@ -37,10 +42,8 @@ export class BookService {
         return { status: HttpStatus.CREATED, message: 'New book has created' };
     }
 
-    public async deleteBook(id: string, user: IUser): PromiseGenericResponse<null> {
-        const numericId = this.utilsService.convertStrTonumber(id);
-
-        const hasDeleted = await this.delete(numericId, user);
+    public async deleteBook(id: number, user: IUser): PromiseGenericResponse<null> {
+        const hasDeleted = await this.delete(id, user);
 
         if (!hasDeleted) {
             throw new BookNotFoundException();
@@ -49,8 +52,40 @@ export class BookService {
         return { status: HttpStatus.OK, message: 'Book has deleted' };
     }
 
-    public async checkIfBookExists(id: number, user: IUser) {
-        const book = await this.findOneById(id, user);
+    public async findAllBook(
+        user: IUser,
+        paginationQueryDto: PaginationQueryDto,
+    ): PromiseGenericResponse<{ books: Array<IBook>; pageInfo: IPageInfo }> {
+        const { skip, take } = this.getPaginationProps(paginationQueryDto);
+
+        const [books, booksCount] = await this.findAllAndCount(user, { skip, take });
+
+        const { items, pageInfo } = this.paginate(
+            { items: books, totalCount: booksCount },
+            { page: skip, currentPage: paginationQueryDto.page, pageSize: take },
+        );
+
+        const serializedBooks = this.serialize(items);
+
+        return { status: HttpStatus.OK, body: { books: serializedBooks, pageInfo } };
+    }
+
+    public async findBookDetails(id: number, user: IUser): PromiseGenericResponse<{ book: IBook }> {
+        const book = await this.checkIfBookExists(id, user, true);
+
+        const serializedBookDetails = this.serializeBookDetails(book);
+
+        return { status: HttpStatus.OK, body: { book: serializedBookDetails } };
+    }
+
+    public async checkIfBookExists(id: number, user: IUser, withRelations?: boolean) {
+        let book: IBook = null;
+
+        if (!withRelations) {
+            book = await this.findOneById(id, user);
+        } else {
+            book = await this.findOneWithRelations(id, user);
+        }
 
         if (!book) {
             throw new BookNotFoundException();
@@ -59,12 +94,31 @@ export class BookService {
         return book;
     }
 
+    public serialize(books: Array<IBook>) {
+        return books.map((book) => new BookResponseEntity(book));
+    }
+
+    public serializeBookDetails(book: IBook) {
+        return new BookDetailsResponseEntity(book);
+    }
+
     public findOneById(id: number, user: IUser) {
         return this.bookRepository.findOneByCondition({ where: { id, user } });
     }
 
+    public findAllAndCount(user: IUser, pagination: PaginationProps) {
+        return this.bookRepository.findAllAndCount({ where: { user }, ...pagination });
+    }
+
     public findOneByName(name: string, user: IUser) {
         return this.bookRepository.findOneByCondition({ where: { name, user } });
+    }
+
+    public findOneWithRelations(id: number, user: IUser) {
+        return this.bookRepository.findOneByCondition({
+            where: { id, user },
+            relations: { lastReadPage: true, pages: true, collectionBooks: true, user: true },
+        });
     }
 
     public createAndSave(book: Partial<IBook>) {

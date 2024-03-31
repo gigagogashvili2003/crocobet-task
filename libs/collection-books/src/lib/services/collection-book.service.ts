@@ -30,7 +30,7 @@ export class CollectionBookService extends PaginationService<ICollectionBook> {
     }
 
     public async addBook(
-        id: string,
+        id: number,
         addBookToCollectionDto: AddBookToCollectionDto,
         currentUser: IUser,
     ): PromiseGenericResponse<null> {
@@ -56,7 +56,7 @@ export class CollectionBookService extends PaginationService<ICollectionBook> {
     }
 
     public async removeBook(
-        id: string,
+        id: number,
         addBookToCollectionDto: AddBookToCollectionDto,
         currentUser: IUser,
     ): PromiseGenericResponse<null> {
@@ -76,7 +76,7 @@ export class CollectionBookService extends PaginationService<ICollectionBook> {
     }
 
     public async findAllBook(
-        id: string,
+        id: number,
         currentUser: IUser,
         paginationQueryDto: PaginationQueryDto,
     ): PromiseGenericResponse<{ collectionBooks: ICollectionBook[]; pageInfo: IPageInfo }> {

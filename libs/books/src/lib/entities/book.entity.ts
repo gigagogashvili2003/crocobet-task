@@ -2,7 +2,7 @@ import { BookPage } from '@app/book-pages/lib/entities';
 import { CollectionBook } from '@app/collection-books/lib/entities';
 import { BaseEntity } from '@app/common';
 import { User } from '@app/users';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 @Entity('books')
 export class Book extends BaseEntity {
@@ -18,4 +18,8 @@ export class Book extends BaseEntity {
 
     @OneToMany(() => BookPage, (page) => page.book, { cascade: true })
     pages: BookPage[];
+
+    @OneToOne(() => BookPage, (page) => page.book)
+    @JoinColumn({ name: 'last_read_page_id' })
+    lastReadPage: BookPage;
 }

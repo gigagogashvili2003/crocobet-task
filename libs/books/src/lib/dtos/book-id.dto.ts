@@ -1,3 +1,3 @@
 export class BookIdDto {
-    readonly id: string;
+    readonly id: number;
 }

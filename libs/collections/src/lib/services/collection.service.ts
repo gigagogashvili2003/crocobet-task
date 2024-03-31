@@ -32,18 +32,18 @@ export class CollectionService {
         return { status: HttpStatus.OK, message: 'New collection has created!' };
     }
 
-    public async deleteCollection(id: string, currentUser: IUser) {
-        const numericId = this.utilsService.convertStrTonumber(id);
-
-        const hasDeleted = await this.deleteByUser(numericId, currentUser);
+    public async deleteCollection(id: number, currentUser: IUser): PromiseGenericResponse<null> {
+        const hasDeleted = await this.deleteByUser(id, currentUser);
 
         if (!hasDeleted) {
             throw new CollectionNotFoundException();
         }
+
+        return { status: HttpStatus.OK, message: 'Collection has deleted' };
     }
 
     public async updateCollection(
-        id: string,
+        id: number,
         updateCollectionDto: UpdateCollectionDto,
         currentUser: IUser,
     ): PromiseGenericResponse<null> {
@@ -63,7 +63,7 @@ export class CollectionService {
     }
 
     public async findCollectionDetails(
-        id: string,
+        id: number,
         currentUser: IUser,
     ): PromiseGenericResponse<{ collection: ICollection }> {
         const collection = await this.checkIfCollectionExists(id, currentUser, true);
@@ -73,14 +73,12 @@ export class CollectionService {
         return { status: HttpStatus.OK, body: { collection: serializedCollection } };
     }
 
-    public async checkIfCollectionExists(id: string, currentUser: IUser, withRelations?: boolean) {
-        const numericId = this.utilsService.convertStrTonumber(id);
-
+    public async checkIfCollectionExists(id: number, currentUser: IUser, withRelations?: boolean) {
         let collection: ICollection = null;
         if (!withRelations) {
-            collection = await this.findOneById(numericId, currentUser);
+            collection = await this.findOneById(id, currentUser);
         } else {
-            collection = await this.findOneByIdWithRelations(numericId, currentUser);
+            collection = await this.findOneByIdWithRelations(id, currentUser);
         }
 
         if (!collection) {
