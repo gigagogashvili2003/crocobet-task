@@ -3,6 +3,7 @@ import { AUTH_SERVICE } from '@app/auth/lib/constants';
 import { RefreshTokenDto, SignInDto, VerifyDto } from '@app/auth/lib/dtos';
 import { VerifySchema } from '@app/auth/lib/schemas';
 import { AccessTokenGuard, LocalGuard, RefreshTokenGuard } from '@app/common';
+import { ThrottlerConfig } from '@app/common/lib/config';
 import { CurrentUser } from '@app/common/lib/decorators';
 import { SessionNotFoundException } from '@app/common/lib/exceptions';
 import { JoiValidationPipe } from '@app/common/lib/pipes';
@@ -25,6 +26,7 @@ import {
     UsePipes,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('auth')
