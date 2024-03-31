@@ -9,5 +9,6 @@ export interface IBook extends IDate {
     collectionBooks: ICollectionBook[];
     user: IUser;
     pages: IBookPage[];
-    lastReadPage: IBookPage;
+    // lastReadPage: IBookPage;
+    author: string;
 }

@@ -24,7 +24,7 @@ export class BookService extends PaginationService<IBook> {
     }
 
     public async createBook(createBookDto: CreateBookDto, currentUser: IUser): PromiseGenericResponse<null> {
-        const { name, pages } = createBookDto;
+        const { name, pages, author } = createBookDto;
 
         const bookExists = await this.findOneByName(name, currentUser);
 
@@ -37,7 +37,7 @@ export class BookService extends PaginationService<IBook> {
             bookPages = this.bookPageService.preloadBookPages(pages);
         }
 
-        await this.createAndSave({ user: currentUser, name, pages: bookPages });
+        await this.createAndSave({ user: currentUser, name, author, pages: bookPages });
 
         return { status: HttpStatus.CREATED, message: 'New book has created' };
     }
@@ -85,15 +85,23 @@ export class BookService extends PaginationService<IBook> {
     ): PromiseGenericResponse<{ page: IBookPage }> {
         const book = await this.checkIfBookExists(bookId, currentUser);
 
-        console.log(book);
-
         const page = await this.bookPageService.checkIfPageExists(pageId, book);
 
         const serializedPage = this.bookPageService.serialize(page);
 
-        await this.update(book.id, currentUser, { lastReadPage: page });
+        // await this.update(book.id, currentUser, { lastReadPage: page });
 
         return { status: HttpStatus.OK, body: { page: serializedPage } };
+    }
+
+    public async changeLastReadPage(bookId: number, pageId: number, currentUser: IUser): PromiseGenericResponse<null> {
+        const book = await this.checkIfBookExists(bookId, currentUser, true);
+
+        const newPage = await this.bookPageService.checkIfPageExists(pageId, book);
+
+        // await this.update(book.id, currentUser, { lastReadPage: newPage });
+
+        return { status: HttpStatus.OK, message: 'Last read page has updated!' };
     }
 
     public async checkIfBookExists(id: number, user: IUser, withRelations?: boolean) {
@@ -135,12 +143,12 @@ export class BookService extends PaginationService<IBook> {
     public findOneWithRelations(id: number, user: IUser) {
         return this.bookRepository.findOneByCondition({
             where: { id, user },
-            relations: { lastReadPage: true, pages: true, collectionBooks: true, user: true },
+            relations: { pages: true, collectionBooks: true, user: true },
         });
     }
 
     public update(id: number, user: IUser, data: Partial<IBook>) {
-        return this.bookRepository.update({ id, user }, data);
+        return this.bookRepository.update({ id, user }, {});
     }
 
     public createAndSave(book: Partial<IBook>) {

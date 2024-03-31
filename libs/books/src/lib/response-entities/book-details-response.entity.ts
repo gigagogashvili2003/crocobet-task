@@ -14,6 +14,9 @@ export class BookDetailsResponseEntity implements IBook {
     @ApiProperty()
     public readonly name: string;
 
+    @ApiProperty()
+    public author: string;
+
     @Type(() => BookPageResponseEntity)
     lastReadPage: BookPageResponseEntity;
 

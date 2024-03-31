@@ -6,4 +6,6 @@ export class CreateBookDto {
 
     @Type(() => CreateBookPageDto)
     readonly pages: Array<{ content: string }>;
+
+    readonly author: string;
 }

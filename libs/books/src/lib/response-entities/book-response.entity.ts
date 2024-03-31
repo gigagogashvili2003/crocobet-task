@@ -3,7 +3,8 @@ import { ICollectionBook } from '@app/collection-books/lib/interfaces';
 import { IUser } from '@app/users/lib/interfaces';
 import { IBook } from '../interfaces';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { BookPageResponseEntity } from '@app/book-pages/lib/response-entity';
 
 export class BookResponseEntity implements IBook {
     @ApiProperty()
@@ -13,7 +14,11 @@ export class BookResponseEntity implements IBook {
     public readonly name: string;
 
     @ApiProperty()
-    lastReadPage: IBookPage;
+    public author: string;
+
+    @Type(() => BookPageResponseEntity)
+    @Expose({ name: 'lastReadPage' })
+    public readonly lastReadPage: BookPageResponseEntity;
 
     @ApiHideProperty()
     @Exclude()

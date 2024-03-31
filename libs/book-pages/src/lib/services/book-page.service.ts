@@ -15,7 +15,7 @@ export class BookPageService {
     }
 
     public async checkIfPageExists(id: number, book: IBook) {
-        const bookPage = await this.bookPageRepository.findOneByCondition({ where: { id, book } });
+        const bookPage = await this.bookPageRepository.findOneByCondition({ where: { id, book: { id: book.id } } });
 
         if (!bookPage) {
             throw new BookPageNotFoundException();

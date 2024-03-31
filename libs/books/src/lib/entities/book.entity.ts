@@ -9,6 +9,9 @@ export class Book extends BaseEntity {
     @Column({ type: 'varchar', nullable: false, unique: true })
     name: string;
 
+    @Column({ type: 'varchar', nullable: false })
+    author: string;
+
     @OneToMany(() => CollectionBook, (collectionBook) => collectionBook.book)
     collectionBooks: CollectionBook[];
 
@@ -19,7 +22,7 @@ export class Book extends BaseEntity {
     @OneToMany(() => BookPage, (page) => page.book, { cascade: true })
     pages: BookPage[];
 
-    @OneToOne(() => BookPage, (page) => page.book)
+    @OneToOne(() => BookPage, { lazy: true, nullable: true })
     @JoinColumn({ name: 'last_read_page_id' })
-    lastReadPage: BookPage;
+    lastReadPage: Promise<BookPage>;
 }

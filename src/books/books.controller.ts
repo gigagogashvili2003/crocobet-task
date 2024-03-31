@@ -17,6 +17,7 @@ import {
     Get,
     Inject,
     Param,
+    Patch,
     Post,
     Query,
     UseGuards,
@@ -45,6 +46,16 @@ export class BooksController {
         return this.bookService.deleteBook(params.id, currentUser);
     }
 
+    @Patch(':id')
+    @UseGuards(AccessTokenGuard)
+    public update(
+        @Param(new JoiValidationPipe(BookIdSchema)) params: DeleteBookParamDto,
+        @CurrentUser() currentUser: IUser,
+    ) {
+        return this.bookService.deleteBook(params.id, currentUser);
+    }
+
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get()
     @UseGuards(AccessTokenGuard)
     public findAllBook(
@@ -71,5 +82,15 @@ export class BooksController {
         @CurrentUser() currentUser: IUser,
     ) {
         return this.bookService.readPage(params.id, params.pageId, currentUser);
+    }
+
+    @Patch(':id/pages')
+    @UseGuards(AccessTokenGuard)
+    public changeLastReadPage(
+        @Param(new JoiValidationPipe(BookIdSchema)) params: DeleteBookParamDto,
+        @Body(new JoiValidationPipe(PageIdSchema)) pageIdDto: PageIdDto,
+        @CurrentUser() currentUser: IUser,
+    ) {
+        return this.bookService.changeLastReadPage(params.id, pageIdDto.pageId, currentUser);
     }
 }
