@@ -1,4 +1,6 @@
 
+To run the project just clone it, and then run docker compose up.
+
 DB Structure
 
 ### Users
