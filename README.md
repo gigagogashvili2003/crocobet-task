@@ -1,5 +1,45 @@
 
-To run the project just clone it, and then run docker compose up.
+## Running the Project
+
+### Prerequisites
+- Docker
+- Docker Compose
+
+### Steps
+
+1. **Clone the Repository:**
+    ```bash
+    git clone <repository_url>
+    ```
+
+2. **Navigate to the Project Directory:**
+    ```bash
+    cd <project_directory>
+    ```
+
+3. **Run Docker Compose:**
+    ```bash
+    docker-compose up
+    ```
+
+4. **Access the Application:**
+    Once Docker Compose has finished setting up the containers, you can access the application by navigating to [http://localhost](http://localhost) in your web browser.
+
+5. **Stopping the Application:**
+    To stop the application and remove the containers, you can use the following command:
+    ```bash
+    docker-compose down
+    ```
+
+6. **Cleanup:**
+    Optionally, you can remove any dangling Docker images and volumes using the following commands:
+    ```bash
+    docker image prune
+    docker volume prune
+    ```
+
+That's it! You should now have the project up and running using Docker Compose.
+
 
 DB Structure
 
