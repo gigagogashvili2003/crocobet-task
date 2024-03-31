@@ -1,5 +1,6 @@
 import { COLLECTION_BOOK_SERVICE } from '@app/collection-books/lib/constants';
 import { AddBookToCollectionDto, DeleteBookFromCollectionDto } from '@app/collection-books/lib/dtos';
+import { CollectionBookResponseEntity } from '@app/collection-books/lib/response-entities';
 import { AddBookToCollectionSchema, DeleteBookFromCollectionSchema } from '@app/collection-books/lib/schemas';
 import { CollectionBookService } from '@app/collection-books/lib/services';
 import { CollectionIdDto } from '@app/collections/lib/dtos';
@@ -15,6 +16,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpStatus,
     Inject,
     Param,
     Post,
@@ -22,13 +24,20 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Collection books')
 @Controller('collection-books')
 export class CollectionBooksController {
     public constructor(
         @Inject(COLLECTION_BOOK_SERVICE) private readonly collectionBookService: CollectionBookService,
     ) {}
 
+    @ApiResponse({ description: 'Adds book in a collection', status: HttpStatus.CREATED })
+    @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
+    @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
+    @ApiResponse({ description: 'Book already exists in collection', status: HttpStatus.CONFLICT })
     @Post(':id/books')
     @UseGuards(AccessTokenGuard)
     public addBook(
@@ -39,6 +48,10 @@ export class CollectionBooksController {
         return this.collectionBookService.addBook(params.id, addBookToCollectionDto, currentUser);
     }
 
+    @ApiResponse({ description: 'Removes book from a collection', status: HttpStatus.OK })
+    @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
+    @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
+    @ApiResponse({ description: 'Book not found in the collection', status: HttpStatus.NOT_FOUND })
     @Delete(':id/books')
     @UseGuards(AccessTokenGuard)
     public removeBook(
@@ -50,6 +63,11 @@ export class CollectionBooksController {
         return this.collectionBookService.removeBook(params.id, deleteBookFromCollectionDto, currentUser);
     }
 
+    @ApiResponse({
+        description: 'Returns all book from a collection',
+        status: HttpStatus.OK,
+        type: [CollectionBookResponseEntity],
+    })
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id/books')
     @UseGuards(AccessTokenGuard)

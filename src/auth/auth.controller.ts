@@ -83,12 +83,4 @@ export class AuthController {
     public verify(@Body(new JoiValidationPipe(VerifySchema)) verifyDto: VerifyDto, @CurrentUser() currentUser: IUser) {
         return this.authService.verify(currentUser, verifyDto.code);
     }
-
-    @ApiResponse({ status: HttpStatus.OK, type: ProfileResponseEntity })
-    @UseInterceptors(ClassSerializerInterceptor)
-    @Get('me')
-    @UseGuards(AccessTokenGuard)
-    public me(@CurrentUser() currentUser: IUser) {
-        return this.authService.me(currentUser);
-    }
 }

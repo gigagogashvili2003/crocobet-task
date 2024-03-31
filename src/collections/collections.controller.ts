@@ -6,7 +6,7 @@ import {
     UpdateCollectionDto,
     UpdateCollectionParamDto,
 } from '@app/collections/lib/dtos';
-import { CollectionResponseEntity } from '@app/collections/lib/response-entities';
+import { CollectionDetailsResponseEntity, CollectionResponseEntity } from '@app/collections/lib/response-entities';
 import { CreateCollectionSchema, UpdateCollectionSchema } from '@app/collections/lib/schemas';
 import { CollectionIdSchema } from '@app/collections/lib/schemas/collection-id.schema';
 import { CollectionService } from '@app/collections/lib/services';
@@ -29,8 +29,9 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
 export class CollectionsController {
@@ -74,6 +75,7 @@ export class CollectionsController {
         status: HttpStatus.OK,
         type: [CollectionResponseEntity],
     })
+    @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
     @UseInterceptors(ClassSerializerInterceptor)
     @Get()
     @UseGuards(AccessTokenGuard)
@@ -81,6 +83,12 @@ export class CollectionsController {
         return this.collectionService.findAllCollection(currentUser);
     }
 
+    @ApiResponse({
+        description: 'Returns a specific collection details',
+        status: HttpStatus.OK,
+        type: [CollectionDetailsResponseEntity],
+    })
+    @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id')
     @UseGuards(AccessTokenGuard)

@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from '@app/redis';
 import { envSchema } from '@app/common/lib/schema';
@@ -17,6 +16,7 @@ import { NotificationsModule } from '@app/notifications';
 import { CollectionsModule } from './collections/collections.module';
 import { BooksModule } from './books/books.module';
 import { CollectionBooksModule } from './collection-books/collection-books.module';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
     imports: [
@@ -25,6 +25,7 @@ import { CollectionBooksModule } from './collection-books/collection-books.modul
         JwtModule.register({
             global: true,
         }),
+        TerminusModule,
         RedisModule,
         DbModule,
         CommonModule,
@@ -38,6 +39,6 @@ import { CollectionBooksModule } from './collection-books/collection-books.modul
         CollectionBooksModule,
     ],
     controllers: [AppController],
-    providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
+    providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

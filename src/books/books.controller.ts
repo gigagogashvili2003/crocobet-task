@@ -1,7 +1,10 @@
 import { PageIdDto } from '@app/book-pages/lib/dtos';
+import { BookPageResponseEntity } from '@app/book-pages/lib/response-entity';
 import { PageIdSchema } from '@app/book-pages/lib/schemas';
 import { BOOK_SERVICE } from '@app/books/lib/constants';
 import { BookIdDto, CreateBookDto, DeleteBookParamDto } from '@app/books/lib/dtos';
+import { BookResponseEntity } from '@app/books/lib/response-entities';
+import { BookDetailsResponseEntity } from '@app/books/lib/response-entities/book-details-response.entity';
 import { BookIdSchema, createBookSchema } from '@app/books/lib/schemas';
 import { BookService } from '@app/books/lib/services';
 import { AccessTokenGuard, PaginationQueryDto } from '@app/common';
@@ -15,6 +18,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpStatus,
     Inject,
     Param,
     Patch,
@@ -23,11 +27,16 @@ import {
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Books')
 @Controller('books')
 export class BooksController {
     public constructor(@Inject(BOOK_SERVICE) private readonly bookService: BookService) {}
 
+    @ApiResponse({ description: 'Creates new book', status: HttpStatus.CREATED })
+    @ApiResponse({ description: 'Book already exists', status: HttpStatus.CONFLICT })
     @Post()
     @UseGuards(AccessTokenGuard)
     public create(
@@ -37,6 +46,8 @@ export class BooksController {
         return this.bookService.createBook(createBookDto, currentUser);
     }
 
+    @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
+    @ApiResponse({ description: 'Deletes a single book', status: HttpStatus.OK })
     @Delete(':id')
     @UseGuards(AccessTokenGuard)
     public delete(
@@ -46,6 +57,8 @@ export class BooksController {
         return this.bookService.deleteBook(params.id, currentUser);
     }
 
+    @ApiResponse({ description: 'Updates a book', status: HttpStatus.OK })
+    @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @Patch(':id')
     @UseGuards(AccessTokenGuard)
     public update(
@@ -55,6 +68,7 @@ export class BooksController {
         return this.bookService.deleteBook(params.id, currentUser);
     }
 
+    @ApiResponse({ description: 'Returns all book', status: HttpStatus.OK, type: [BookResponseEntity] })
     @UseInterceptors(ClassSerializerInterceptor)
     @Get()
     @UseGuards(AccessTokenGuard)
@@ -65,6 +79,8 @@ export class BooksController {
         return this.bookService.findAllBook(user, paginationQueryDto);
     }
 
+    @ApiResponse({ description: 'Returns a single book', status: HttpStatus.OK, type: BookDetailsResponseEntity })
+    @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id')
     @UseGuards(AccessTokenGuard)
@@ -75,6 +91,8 @@ export class BooksController {
         return this.bookService.findBookDetails(params.id, currentUser);
     }
 
+    @ApiResponse({ description: 'Returns a single page', status: HttpStatus.OK, type: BookPageResponseEntity })
+    @ApiResponse({ description: 'Book page not found', status: HttpStatus.NOT_FOUND })
     @Get(':id/pages/:pageId')
     @UseGuards(AccessTokenGuard)
     public readPage(
@@ -84,6 +102,8 @@ export class BooksController {
         return this.bookService.readPage(params.id, params.pageId, currentUser);
     }
 
+    @ApiResponse({ description: 'Changes last read page', status: HttpStatus.OK })
+    @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @Patch(':id/pages')
     @UseGuards(AccessTokenGuard)
     public changeLastReadPage(
