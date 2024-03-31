@@ -21,7 +21,6 @@ export class CollectionService {
     ): PromiseGenericResponse<null> {
         const { name } = createCollectionDto;
 
-        console.log(currentUser);
         const collectionExists = await this.findOneByName(name, currentUser);
 
         if (collectionExists) {
@@ -48,13 +47,7 @@ export class CollectionService {
         updateCollectionDto: UpdateCollectionDto,
         currentUser: IUser,
     ): PromiseGenericResponse<null> {
-        const numericId = this.utilsService.convertStrTonumber(id);
-
-        const collection = await this.findOneById(numericId, currentUser);
-
-        if (!collection) {
-            throw new CollectionNotFoundException();
-        }
+        const collection = await this.checkIfCollectionExists(id, currentUser);
 
         await this.update(collection.id, currentUser, { ...updateCollectionDto });
 
@@ -73,17 +66,28 @@ export class CollectionService {
         id: string,
         currentUser: IUser,
     ): PromiseGenericResponse<{ collection: ICollection }> {
+        const collection = await this.checkIfCollectionExists(id, currentUser, true);
+
+        const serializedCollection = this.serializeCollectionDetails(collection);
+
+        return { status: HttpStatus.OK, body: { collection: serializedCollection } };
+    }
+
+    public async checkIfCollectionExists(id: string, currentUser: IUser, withRelations?: boolean) {
         const numericId = this.utilsService.convertStrTonumber(id);
 
-        const collection = await this.findOneByIdWithRelations(numericId, currentUser);
+        let collection: ICollection = null;
+        if (!withRelations) {
+            collection = await this.findOneById(numericId, currentUser);
+        } else {
+            collection = await this.findOneByIdWithRelations(numericId, currentUser);
+        }
 
         if (!collection) {
             throw new CollectionNotFoundException();
         }
 
-        const serializedCollection = this.serializeCollectionDetails(collection);
-
-        return { status: HttpStatus.OK, body: { collection: serializedCollection } };
+        return collection;
     }
 
     public serializeCollectionDetails(collection: ICollection) {

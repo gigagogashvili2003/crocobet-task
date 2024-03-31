@@ -49,6 +49,20 @@ export class BookService {
         return { status: HttpStatus.OK, message: 'Book has deleted' };
     }
 
+    public async checkIfBookExists(id: number, user: IUser) {
+        const book = await this.findOneById(id, user);
+
+        if (!book) {
+            throw new BookNotFoundException();
+        }
+
+        return book;
+    }
+
+    public findOneById(id: number, user: IUser) {
+        return this.bookRepository.findOneByCondition({ where: { id, user } });
+    }
+
     public findOneByName(name: string, user: IUser) {
         return this.bookRepository.findOneByCondition({ where: { name, user } });
     }

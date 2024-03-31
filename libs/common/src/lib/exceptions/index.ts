@@ -11,3 +11,5 @@ export * from './nan.exception';
 export * from './collection-not-found.exception';
 export * from './book-not-found.exception';
 export * from './book-already-exists.exception';
+export * from './book-already-exists-in-collection.exeception';
+export * from './book-not-found-in-collection.exception';

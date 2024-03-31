@@ -6,3 +6,7 @@ export * from './throttler.interface';
 export * from './req-with-user';
 export * from './date.interface';
 export * from './jwt-payload.interface';
+export * from './query-result.interface';
+export * from './pagination-query.dto';
+export * from './pagination-result.interface';
+export * from './pagination-page.interface';
