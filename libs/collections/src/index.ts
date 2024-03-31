@@ -1,2 +1,2 @@
 export * from './collections.module';
-export * from './collections.service';
+export * from './lib/entities';

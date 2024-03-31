@@ -1,19 +1,20 @@
-import { Controller, Get, Inject } from '@nestjs/common'
-import { AppService } from './app.service'
-import { REDIS_SERVICE } from '@app/redis/lib/constants'
-import { RedisService } from '@app/redis'
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { HealthCheck, HealthCheckResult, HealthCheckService, TypeOrmHealthIndicator } from '@nestjs/terminus';
 
+@ApiTags('App')
 @Controller()
 export class AppController {
     constructor(
-        private readonly appService: AppService,
-        @Inject(REDIS_SERVICE) private readonly redisService: RedisService,
+        private readonly healthCheckService: HealthCheckService,
+        private db: TypeOrmHealthIndicator,
     ) {}
 
-    @Get()
-    getHello() {
-        this.redisService.set('hello', 'world')
-        return this.redisService.get('hello')
-        // return this.appService.getHello()
+    @ApiResponse({ description: 'Checks if db is health', status: HttpStatus.OK })
+    @HttpCode(HttpStatus.OK)
+    @Get('health')
+    @HealthCheck()
+    async check(): Promise<HealthCheckResult> {
+        return this.healthCheckService.check([() => this.db.pingCheck('database')]);
     }
 }

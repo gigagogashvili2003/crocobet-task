@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
-import { CollectionsService } from './collections.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Collection } from './lib/entities';
+import { collectionProviders } from './lib/providers';
+import { RedisModule } from '@app/redis';
 
 @Module({
-  providers: [CollectionsService],
-  exports: [CollectionsService],
+    imports: [TypeOrmModule.forFeature([Collection]), RedisModule],
+    providers: [...collectionProviders],
+    exports: [...collectionProviders],
 })
-export class CollectionsModule {}
+export class CollectionsLibModule {}
