@@ -93,7 +93,7 @@ export class AuthService {
 
         await Promise.all([
             this.redisService.set(key, otp, RedisTTL.FIVE_MINUTE),
-            this.mailSenderService.sendEmail('thegogashvili@gmail.com', 'Account Verification', otp.toString()),
+            this.mailSenderService.sendEmail(email, 'Account Verification', otp.toString()),
         ]);
 
         return { status: HttpStatus.OK, message: 'Otp has sent to the email!' };
@@ -118,12 +118,6 @@ export class AuthService {
         ]);
 
         return { status: HttpStatus.OK, message: 'Your account has verified!' };
-    }
-
-    public me(currentUser: IUser): GenericResponse<{ user: IUser }> {
-        const serializedUser = this.userService.serialize(currentUser);
-
-        return { status: HttpStatus.OK, body: { user: serializedUser } };
     }
 
     public signTokens(payload: JwtPayloadInterface): Promise<[string, string]> {

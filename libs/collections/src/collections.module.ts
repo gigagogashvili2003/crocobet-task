@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Collection } from './lib/entities';
 import { collectionProviders } from './lib/providers';
-import { UtilsModule } from '@app/utils';
+import { RedisModule } from '@app/redis';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Collection]), UtilsModule],
+    imports: [TypeOrmModule.forFeature([Collection]), RedisModule],
     providers: [...collectionProviders],
     exports: [...collectionProviders],
 })

@@ -6,13 +6,14 @@ import {
     UpdateCollectionDto,
     UpdateCollectionParamDto,
 } from '@app/collections/lib/dtos';
-import { CollectionResponseEntity } from '@app/collections/lib/response-entities';
+import { CollectionDetailsResponseEntity, CollectionResponseEntity } from '@app/collections/lib/response-entities';
 import { CreateCollectionSchema, UpdateCollectionSchema } from '@app/collections/lib/schemas';
 import { CollectionIdSchema } from '@app/collections/lib/schemas/collection-id.schema';
 import { CollectionService } from '@app/collections/lib/services';
-import { AccessTokenGuard } from '@app/common';
+import { AccessTokenGuard, PaginationQueryDto } from '@app/common';
 import { CurrentUser } from '@app/common/lib/decorators';
 import { JoiValidationPipe } from '@app/common/lib/pipes';
+import { PaginationQuerySchema } from '@app/common/lib/schema';
 import { IUser } from '@app/users/lib/interfaces';
 import {
     Body,
@@ -26,11 +27,13 @@ import {
     Param,
     Patch,
     Post,
+    Query,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @ApiTags('Collections')
 @Controller('collections')
 export class CollectionsController {
@@ -74,10 +77,30 @@ export class CollectionsController {
         status: HttpStatus.OK,
         type: [CollectionResponseEntity],
     })
+    @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
     @UseInterceptors(ClassSerializerInterceptor)
     @Get()
     @UseGuards(AccessTokenGuard)
-    public findAllCollection(@CurrentUser() currentUser: IUser) {
-        return this.collectionService.findAllCollection(currentUser);
+    public findAllCollection(
+        @CurrentUser() currentUser: IUser,
+        @Query(new JoiValidationPipe(PaginationQuerySchema)) paginationQueryDto: PaginationQueryDto,
+    ) {
+        return this.collectionService.findAllCollection(currentUser, paginationQueryDto);
+    }
+
+    @ApiResponse({
+        description: 'Returns a specific collection details',
+        status: HttpStatus.OK,
+        type: [CollectionDetailsResponseEntity],
+    })
+    @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
+    @UseInterceptors(ClassSerializerInterceptor)
+    @Get(':id')
+    @UseGuards(AccessTokenGuard)
+    public findCollectionDetails(
+        @Param(new JoiValidationPipe(CollectionIdSchema)) params: CollectionIdDto,
+        @CurrentUser() currentUser: IUser,
+    ) {
+        return this.collectionService.findCollectionDetails(params.id, currentUser);
     }
 }

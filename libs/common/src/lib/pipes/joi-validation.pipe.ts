@@ -6,7 +6,9 @@ export class JoiValidationPipe implements PipeTransform {
     constructor(private readonly schema: Joi.ObjectSchema) {}
 
     transform(value: any, metadata: ArgumentMetadata) {
-        const { error } = this.schema.validate(value);
+        const extendedSchema = this.schema.options({ presence: 'optional', convert: true });
+
+        const { error, value: validatedValue } = extendedSchema.validate(value);
 
         console.log(error);
 
@@ -14,6 +16,6 @@ export class JoiValidationPipe implements PipeTransform {
             throw new BadRequestException('Validation failed', error.message);
         }
 
-        return value;
+        return validatedValue;
     }
 }

@@ -27,6 +27,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.3.1",
+    "@nestjs/terminus": "^10.2.3",
     "@nestjs/throttler": "^5.1.2",
     "@nestjs/typeorm": "^10.0.2",
     "aws-sdk": "^2.1589.0",
@@ -99,7 +100,10 @@
       "^@app/sessions(|/.*)$": "<rootDir>/libs/sessions/src/$1",
       "^@app/books(|/.*)$": "<rootDir>/libs/books/src/$1",
       "^@app/db(|/.*)$": "<rootDir>/libs/db/src/$1",
-      "^@app/notifications(|/.*)$": "<rootDir>/libs/notifications/src/$1"
+      "^@app/notifications(|/.*)$": "<rootDir>/libs/notifications/src/$1",
+      "^@app/book-pages(|/.*)$": "<rootDir>/libs/book-pages/src/$1",
+      "^@app/collection-books(|/.*)$": "<rootDir>/libs/collection-books/src/$1",
+      "^@app/book-page-reads(|/.*)$": "<rootDir>/libs/book-page-reads/src/$1"
     }
   }
 }

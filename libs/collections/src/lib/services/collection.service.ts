@@ -1,20 +1,27 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { COLLECTION_REPOSITORY } from '../constants';
-import { CollectionRepository } from '../repositories';
-import { ICollection } from '../interfaces';
+import { ICollection, ICollectionRepository } from '../interfaces';
 import { CreateCollectionDto, UpdateCollectionDto } from '../dtos';
 import { IUser } from '@app/users/lib/interfaces';
 import { CollectionAlreadyExistsException, CollectionNotFoundException } from '@app/common/lib/exceptions';
 import { PromiseGenericResponse } from '@app/common/lib/types';
-import { UTILS_SERVICE, UtilsService } from '@app/utils';
-import { CollectionResponseEntity } from '../response-entities';
+import { CollectionDetailsResponseEntity, CollectionResponseEntity } from '../response-entities';
+import { REDIS_HELPER_SERVICE, REDIS_SERVICE } from '@app/redis/lib/constants';
+import { RedisHelperService, RedisService } from '@app/redis';
+import { PaginationService } from '@app/utils';
+import { PaginationQueryDto } from '@app/common';
+import { FindAllCollections } from '../types';
+import { RedisTTL } from '@app/redis/lib/enums';
 
 @Injectable()
-export class CollectionService {
+export class CollectionService extends PaginationService<ICollection> {
     public constructor(
-        @Inject(COLLECTION_REPOSITORY) private readonly collectionRepository: CollectionRepository,
-        @Inject(UTILS_SERVICE) private readonly utilsService: UtilsService,
-    ) {}
+        @Inject(COLLECTION_REPOSITORY) private readonly collectionRepository: ICollectionRepository,
+        @Inject(REDIS_SERVICE) private readonly redisService: RedisService,
+        @Inject(REDIS_HELPER_SERVICE) private readonly redisHelperService: RedisHelperService,
+    ) {
+        super();
+    }
 
     public async createCollection(
         createCollectionDto: CreateCollectionDto,
@@ -22,7 +29,7 @@ export class CollectionService {
     ): PromiseGenericResponse<null> {
         const { name } = createCollectionDto;
 
-        const collectionExists = await this.findOneByName(name);
+        const collectionExists = await this.findOneByName(name, currentUser);
 
         if (collectionExists) {
             throw new CollectionAlreadyExistsException();
@@ -33,40 +40,88 @@ export class CollectionService {
         return { status: HttpStatus.OK, message: 'New collection has created!' };
     }
 
-    public async deleteCollection(id: string, currentUser: IUser) {
-        const numericId = this.utilsService.convertStrTonumber(id);
-
-        const hasDeleted = await this.deleteByUser(numericId, currentUser);
+    public async deleteCollection(id: number, currentUser: IUser): PromiseGenericResponse<null> {
+        const hasDeleted = await this.deleteByUser(id, currentUser);
 
         if (!hasDeleted) {
             throw new CollectionNotFoundException();
         }
+
+        return { status: HttpStatus.OK, message: 'Collection has deleted' };
     }
 
     public async updateCollection(
-        id: string,
+        id: number,
         updateCollectionDto: UpdateCollectionDto,
         currentUser: IUser,
     ): PromiseGenericResponse<null> {
-        const numericId = this.utilsService.convertStrTonumber(id);
-
-        const collection = await this.findOneById(numericId, currentUser);
-
-        if (!collection) {
-            throw new CollectionNotFoundException();
-        }
+        const collection = await this.checkIfCollectionExists(id, currentUser);
 
         await this.update(collection.id, currentUser, { ...updateCollectionDto });
 
         return { status: HttpStatus.OK, message: 'Collection has updated!' };
     }
 
-    public async findAllCollection(currentUser: IUser): PromiseGenericResponse<{ collections: Array<ICollection> }> {
-        const collections = await this.findAll(currentUser);
+    public async findAllCollection(
+        currentUser: IUser,
+        paginatonQueryDto: PaginationQueryDto,
+    ): PromiseGenericResponse<FindAllCollections> {
+        const { skip, take } = this.getPaginationProps(paginatonQueryDto);
 
-        const serializedCollections = this.serializeCollections(collections);
+        const cacheKey = this.redisHelperService.generateCollectionsCache(currentUser.id);
+        const cacheExists = await this.redisService.get(cacheKey);
 
-        return { status: HttpStatus.OK, body: { collections: serializedCollections } };
+        if (cacheExists) {
+            const parsedData: FindAllCollections = JSON.parse(cacheExists);
+            return { status: HttpStatus.OK, body: { ...parsedData } };
+        }
+
+        const [collections, collectionsCount] = await this.findAllAndCount(currentUser);
+
+        const { items, pageInfo } = this.paginate(
+            { items: collections, totalCount: collectionsCount },
+            { page: skip, currentPage: paginatonQueryDto.page, pageSize: take },
+        );
+
+        const serializedCollections = this.serializeCollections(items);
+
+        await this.redisService.set(
+            cacheKey,
+            JSON.stringify({ collections: serializedCollections, pageInfo }),
+            RedisTTL.ONE_MINUTE,
+        );
+
+        return { status: HttpStatus.OK, body: { collections: serializedCollections, pageInfo } };
+    }
+
+    public async findCollectionDetails(
+        id: number,
+        currentUser: IUser,
+    ): PromiseGenericResponse<{ collection: ICollection }> {
+        const collection = await this.checkIfCollectionExists(id, currentUser, true);
+
+        const serializedCollection = this.serializeCollectionDetails(collection);
+
+        return { status: HttpStatus.OK, body: { collection: serializedCollection } };
+    }
+
+    public async checkIfCollectionExists(id: number, currentUser: IUser, withRelations?: boolean) {
+        let collection: ICollection = null;
+        if (!withRelations) {
+            collection = await this.findOneById(id, currentUser);
+        } else {
+            collection = await this.findOneByIdWithRelations(id, currentUser);
+        }
+
+        if (!collection) {
+            throw new CollectionNotFoundException();
+        }
+
+        return collection;
+    }
+
+    public serializeCollectionDetails(collection: ICollection) {
+        return new CollectionDetailsResponseEntity(collection);
     }
 
     public serializeCollections(collections: Array<ICollection>) {
@@ -77,12 +132,16 @@ export class CollectionService {
         return this.collectionRepository.delete({ id, user });
     }
 
-    public findOneByName(name: string) {
-        return this.collectionRepository.findOneByCondition({ where: { name } });
+    public findOneByName(name: string, user: IUser) {
+        return this.collectionRepository.findOneByCondition({ where: { name, user } });
     }
 
     public findOneById(id: number, user: IUser) {
         return this.collectionRepository.findOneByCondition({ where: { id, user } });
+    }
+
+    public findOneByIdWithRelations(id: number, user: IUser) {
+        return this.collectionRepository.findOneByCondition({ where: { id, user }, relations: { user: true } });
     }
 
     public createAndSave(collection: Partial<ICollection>) {
@@ -94,7 +153,7 @@ export class CollectionService {
         return this.collectionRepository.update({ id, user }, collection);
     }
 
-    public findAll(user: IUser) {
-        return this.collectionRepository.findAll({ where: { user } });
+    public findAllAndCount(user: IUser) {
+        return this.collectionRepository.findAllAndCount({ where: { user } });
     }
 }

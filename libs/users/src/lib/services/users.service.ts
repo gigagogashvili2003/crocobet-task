@@ -1,11 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { USER_REPOSITORY } from '../constants';
 import { IUser, IUserRepository } from '../interfaces';
 import { ProfileResponseEntity } from '../response-entities';
+import { GenericResponse } from '@app/common';
 
 @Injectable()
 export class UsersService {
     public constructor(@Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository) {}
+
+    public me(currentUser: IUser): GenericResponse<{ user: IUser }> {
+        const serializedUser = this.serialize(currentUser);
+
+        return { status: HttpStatus.OK, body: { user: serializedUser } };
+    }
 
     public serialize(user: IUser) {
         return new ProfileResponseEntity(user);

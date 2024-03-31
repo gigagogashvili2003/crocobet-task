@@ -1,3 +1,3 @@
 export class CollectionIdDto {
-    readonly id: string;
+    readonly id: number;
 }
