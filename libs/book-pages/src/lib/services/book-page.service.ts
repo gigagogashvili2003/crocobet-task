@@ -31,4 +31,9 @@ export class BookPageService {
     public create(bookPage: Partial<IBookPage>) {
         return this.bookPageRepository.create(bookPage);
     }
+
+    public createAndSave(bookPage: Partial<IBookPage>) {
+        const newPage = this.bookPageRepository.create(bookPage);
+        return this.bookPageRepository.save(newPage);
+    }
 }

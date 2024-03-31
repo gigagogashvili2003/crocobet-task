@@ -25,7 +25,6 @@ export class CollectionBookService extends PaginationService<ICollectionBook> {
         @Inject(COLLECTION_BOOK_REPOSITORY) private readonly collectionBookRepository: ICollectionBookRepository,
         @Inject(COLLECTION_SERVICE) private readonly collectionService: CollectionService,
         @Inject(BOOK_SERVICE) private readonly bookService: BookService,
-        @Inject(UTILS_SERVICE) private readonly utilsService: UtilsService,
     ) {
         super();
     }

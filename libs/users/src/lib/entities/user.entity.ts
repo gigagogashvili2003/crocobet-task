@@ -1,3 +1,4 @@
+import { BookPageRead } from '@app/book-page-reads/lib/entities';
 import { Book } from '@app/books/lib/entities';
 import { Collection } from '@app/collections';
 import { BaseEntity } from '@app/common';
@@ -22,4 +23,7 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Book, (book) => book.user)
     books: Book[];
+
+    @OneToMany(() => BookPageRead, (bookPageRead) => bookPageRead.user)
+    bookPageReads: BookPageRead[];
 }

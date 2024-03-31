@@ -1,11 +1,11 @@
-import { PageIdDto } from '@app/book-pages/lib/dtos';
+import { CreateBookPageDto, PageIdDto } from '@app/book-pages/lib/dtos';
 import { BookPageResponseEntity } from '@app/book-pages/lib/response-entity';
-import { PageIdSchema } from '@app/book-pages/lib/schemas';
+import { CreateBookPageSchema, PageIdSchema } from '@app/book-pages/lib/schemas';
 import { BOOK_SERVICE } from '@app/books/lib/constants';
-import { BookIdDto, CreateBookDto, DeleteBookParamDto } from '@app/books/lib/dtos';
+import { BookIdDto, CreateBookDto, DeleteBookParamDto, UpdateBookDto } from '@app/books/lib/dtos';
 import { BookResponseEntity } from '@app/books/lib/response-entities';
 import { BookDetailsResponseEntity } from '@app/books/lib/response-entities/book-details-response.entity';
-import { BookIdSchema, createBookSchema } from '@app/books/lib/schemas';
+import { BookIdSchema, UpdateBookSchema, createBookSchema } from '@app/books/lib/schemas';
 import { BookService } from '@app/books/lib/services';
 import { AccessTokenGuard, PaginationQueryDto } from '@app/common';
 import { CurrentUser } from '@app/common/lib/decorators';
@@ -66,10 +66,11 @@ export class BooksController {
     @Patch(':id')
     @UseGuards(AccessTokenGuard)
     public update(
-        @Param(new JoiValidationPipe(BookIdSchema)) params: DeleteBookParamDto,
+        @Param(new JoiValidationPipe(BookIdSchema)) params: BookIdDto,
+        @Body(new JoiValidationPipe(UpdateBookSchema)) updateBookDto: UpdateBookDto,
         @CurrentUser() currentUser: IUser,
     ) {
-        return this.bookService.deleteBook(params.id, currentUser);
+        return this.bookService.updateBook(params.id, updateBookDto, currentUser);
     }
 
     @ApiResponse({ description: 'Returns all book', status: HttpStatus.OK, type: [BookResponseEntity] })
@@ -107,6 +108,15 @@ export class BooksController {
         @CurrentUser() currentUser: IUser,
     ) {
         return this.bookService.readPage(params.id, params.pageId, currentUser);
+    }
+
+    @Post(':id')
+    public addPage(
+        @Param(new JoiValidationPipe(BookIdSchema)) params: BookIdDto,
+        @CurrentUser() currentUser: IUser,
+        @Body(new JoiValidationPipe(CreateBookPageSchema)) createBookPageDto: CreateBookPageDto,
+    ) {
+        return this.bookService.addPage(params.id, currentUser, createBookPageDto);
     }
 
     @ApiResponse({ description: 'Changes last read page', status: HttpStatus.OK })

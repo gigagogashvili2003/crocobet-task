@@ -117,6 +117,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/collection-books/tsconfig.lib.json"
       }
+    },
+    "book-page-reads": {
+      "type": "library",
+      "root": "libs/book-page-reads",
+      "entryFile": "index",
+      "sourceRoot": "libs/book-page-reads/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/book-page-reads/tsconfig.lib.json"
+      }
     }
   }
 }

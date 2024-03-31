@@ -6,6 +6,7 @@ import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { BookPageResponseEntity } from '@app/book-pages/lib/response-entity';
 import { UserResponseEntity } from '@app/users/lib/response-entities/user-response.entity';
+import { IBookPageRead } from '@app/book-page-reads/lib/interfaces';
 
 export class BookDetailsResponseEntity implements IBook {
     @ApiProperty()
@@ -17,8 +18,7 @@ export class BookDetailsResponseEntity implements IBook {
     @ApiProperty()
     public author: string;
 
-    @Type(() => BookPageResponseEntity)
-    lastReadPage: BookPageResponseEntity;
+    bookPageReads: IBookPageRead[];
 
     @ApiHideProperty()
     @Exclude()

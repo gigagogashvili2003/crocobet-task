@@ -2,6 +2,7 @@ import { ICollection } from '../interfaces';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { UserResponseEntity } from '@app/users/lib/response-entities/user-response.entity';
+import { ICollectionBook } from '@app/collection-books/lib/interfaces';
 
 export class CollectionDetailsResponseEntity implements ICollection {
     @ApiProperty()
@@ -20,6 +21,7 @@ export class CollectionDetailsResponseEntity implements ICollection {
     @ApiProperty()
     public readonly updatedAt: Date;
 
+    collectionBooks: ICollectionBook[];
     constructor(partial: Partial<ICollection>) {
         Object.assign(this, partial);
     }

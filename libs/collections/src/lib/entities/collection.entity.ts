@@ -1,7 +1,6 @@
 import { CollectionBook } from '@app/collection-books/lib/entities';
 import { BaseEntity } from '@app/common';
 import { User } from '@app/users';
-import { IUser } from '@app/users/lib/interfaces';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 
 @Entity('collections')
@@ -12,7 +11,7 @@ export class Collection extends BaseEntity {
 
     @ManyToOne(() => User, (user) => user.collections, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' })
-    user: IUser;
+    user: User;
 
     @OneToMany(() => CollectionBook, (collectionBook) => collectionBook.collection)
     collectionBooks: CollectionBook[];

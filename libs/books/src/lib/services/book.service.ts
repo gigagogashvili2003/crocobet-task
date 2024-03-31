@@ -1,9 +1,13 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { BOOK_REPOSITORY } from '../constants';
 import { IBook, IBookRepository } from '../interfaces';
-import { CreateBookDto } from '../dtos';
+import { CreateBookDto, UpdateBookDto } from '../dtos';
 import { IUser } from '@app/users/lib/interfaces';
-import { BookAlreadyExistsException, BookNotFoundException } from '@app/common/lib/exceptions';
+import {
+    BookAlreadyExistsException,
+    BookNotFoundException,
+    BookPageReadNotFoundException,
+} from '@app/common/lib/exceptions';
 import { BOOK_PAGE_SERVICE } from '@app/book-pages/lib/constants';
 import { BookPageService } from '@app/book-pages/lib/services';
 import { IBookPage } from '@app/book-pages/lib/interfaces/book-page.interface';
@@ -16,6 +20,9 @@ import { RedisHelperService, RedisService } from '@app/redis';
 import { REDIS_HELPER_SERVICE, REDIS_SERVICE } from '@app/redis/lib/constants';
 import { RedisTTL } from '@app/redis/lib/enums';
 import { FindAllBooks } from '../types';
+import { BOOK_PAGE_READ_SERVICE } from '@app/book-page-reads/lib/constants/idnex';
+import { BookPageReadService } from '@app/book-page-reads/lib/services';
+import { CreateBookPageDto } from '@app/book-pages/lib/dtos';
 
 @Injectable()
 export class BookService extends PaginationService<IBook> {
@@ -24,6 +31,7 @@ export class BookService extends PaginationService<IBook> {
         @Inject(BOOK_PAGE_SERVICE) private readonly bookPageService: BookPageService,
         @Inject(REDIS_SERVICE) private readonly redisService: RedisService,
         @Inject(REDIS_HELPER_SERVICE) private readonly redisHelperService: RedisHelperService,
+        @Inject(BOOK_PAGE_READ_SERVICE) private readonly bookPageReadService: BookPageReadService,
     ) {
         super();
     }
@@ -55,6 +63,16 @@ export class BookService extends PaginationService<IBook> {
         }
 
         return { status: HttpStatus.OK, message: 'Book has deleted' };
+    }
+
+    public async updateBook(id: number, updateBookDto: UpdateBookDto, user: IUser): PromiseGenericResponse<null> {
+        const { author, name } = updateBookDto;
+
+        const book = await this.checkIfBookExists(id, user);
+
+        await this.update(book.id, user, { author, name });
+
+        return { status: HttpStatus.OK, message: 'Book has updated succesfully!' };
     }
 
     public async findAllBook(
@@ -106,11 +124,31 @@ export class BookService extends PaginationService<IBook> {
 
         const page = await this.bookPageService.checkIfPageExists(pageId, book);
 
+        const bookPageReadExists = await this.bookPageReadService.findOne(currentUser, book);
+
+        if (bookPageReadExists) {
+            await this.bookPageReadService.update(currentUser, book, { lastReadPage: page });
+        } else {
+            await this.bookPageReadService.createAndSave({ book, user: currentUser, lastReadPage: page });
+        }
+
         const serializedPage = this.bookPageService.serialize(page);
 
-        // await this.update(book.id, currentUser, { lastReadPage: page });
-
         return { status: HttpStatus.OK, body: { page: serializedPage } };
+    }
+
+    public async addPage(
+        bookId: number,
+        currentUser: IUser,
+        createBookPageDto: CreateBookPageDto,
+    ): PromiseGenericResponse<null> {
+        const { content } = createBookPageDto;
+
+        const book = await this.checkIfBookExists(bookId, currentUser);
+
+        await this.bookPageService.createAndSave({ book, content });
+
+        return { status: HttpStatus.OK, message: 'Page has added to the book' };
     }
 
     public async changeLastReadPage(bookId: number, pageId: number, currentUser: IUser): PromiseGenericResponse<null> {
@@ -118,7 +156,13 @@ export class BookService extends PaginationService<IBook> {
 
         const newPage = await this.bookPageService.checkIfPageExists(pageId, book);
 
-        // await this.update(book.id, currentUser, { lastReadPage: newPage });
+        const bookPageReadExists = await this.bookPageReadService.findOne(currentUser, book);
+
+        if (!bookPageReadExists) {
+            throw new BookPageReadNotFoundException();
+        }
+
+        await this.bookPageReadService.update(currentUser, book, { lastReadPage: newPage });
 
         return { status: HttpStatus.OK, message: 'Last read page has updated!' };
     }
@@ -154,7 +198,6 @@ export class BookService extends PaginationService<IBook> {
     public findAllAndCount(user: IUser, pagination: PaginationProps) {
         return this.bookRepository.findAllAndCount({
             where: { user },
-            relations: { lastReadPage: true },
             ...pagination,
         });
     }
@@ -166,12 +209,12 @@ export class BookService extends PaginationService<IBook> {
     public findOneWithRelations(id: number, user: IUser) {
         return this.bookRepository.findOneByCondition({
             where: { id, user },
-            relations: { lastReadPage: true, pages: true, collectionBooks: true, user: true },
+            relations: { pages: true, collectionBooks: true, user: true },
         });
     }
 
     public update(id: number, user: IUser, data: Partial<IBook>) {
-        return this.bookRepository.update({ id, user }, {});
+        return this.bookRepository.update({ id, user }, data);
     }
 
     public createAndSave(book: Partial<IBook>) {
