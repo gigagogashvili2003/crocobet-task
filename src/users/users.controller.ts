@@ -8,6 +8,7 @@ import {
     ClassSerializerInterceptor,
     Controller,
     Get,
+    HttpCode,
     HttpStatus,
     Inject,
     UseGuards,
@@ -22,6 +23,7 @@ export class UsersController {
     public constructor(@Inject(USER_SERVICE) private readonly usersService: UsersService) {}
 
     @ApiResponse({ status: HttpStatus.OK, type: ProfileResponseEntity })
+    @HttpCode(HttpStatus.OK)
     @UseInterceptors(ClassSerializerInterceptor)
     @Get('me')
     @UseGuards(AccessTokenGuard)

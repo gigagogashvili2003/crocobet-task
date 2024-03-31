@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckResult, HealthCheckService, TypeOrmHealthIndicator } from '@nestjs/terminus';
 
 @ApiTags('App')
@@ -10,6 +10,8 @@ export class AppController {
         private db: TypeOrmHealthIndicator,
     ) {}
 
+    @ApiResponse({ description: 'Checks if db is health', status: HttpStatus.OK })
+    @HttpCode(HttpStatus.OK)
     @Get('health')
     @HealthCheck()
     async check(): Promise<HealthCheckResult> {

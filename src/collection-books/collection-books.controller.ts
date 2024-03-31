@@ -16,6 +16,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
     HttpStatus,
     Inject,
     Param,
@@ -38,6 +39,7 @@ export class CollectionBooksController {
     @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @ApiResponse({ description: 'Book already exists in collection', status: HttpStatus.CONFLICT })
+    @HttpCode(HttpStatus.CREATED)
     @Post(':id/books')
     @UseGuards(AccessTokenGuard)
     public addBook(
@@ -52,6 +54,7 @@ export class CollectionBooksController {
     @ApiResponse({ description: 'Collection not found', status: HttpStatus.NOT_FOUND })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @ApiResponse({ description: 'Book not found in the collection', status: HttpStatus.NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
     @Delete(':id/books')
     @UseGuards(AccessTokenGuard)
     public removeBook(
@@ -68,6 +71,7 @@ export class CollectionBooksController {
         status: HttpStatus.OK,
         type: [CollectionBookResponseEntity],
     })
+    @HttpCode(HttpStatus.OK)
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id/books')
     @UseGuards(AccessTokenGuard)

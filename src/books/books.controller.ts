@@ -18,6 +18,7 @@ import {
     Controller,
     Delete,
     Get,
+    HttpCode,
     HttpStatus,
     Inject,
     Param,
@@ -37,6 +38,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Creates new book', status: HttpStatus.CREATED })
     @ApiResponse({ description: 'Book already exists', status: HttpStatus.CONFLICT })
+    @HttpCode(HttpStatus.CREATED)
     @Post()
     @UseGuards(AccessTokenGuard)
     public create(
@@ -48,6 +50,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @ApiResponse({ description: 'Deletes a single book', status: HttpStatus.OK })
+    @HttpCode(HttpStatus.OK)
     @Delete(':id')
     @UseGuards(AccessTokenGuard)
     public delete(
@@ -59,6 +62,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Updates a book', status: HttpStatus.OK })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
     @Patch(':id')
     @UseGuards(AccessTokenGuard)
     public update(
@@ -70,6 +74,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Returns all book', status: HttpStatus.OK, type: [BookResponseEntity] })
     @UseInterceptors(ClassSerializerInterceptor)
+    @HttpCode(HttpStatus.OK)
     @Get()
     @UseGuards(AccessTokenGuard)
     public findAllBook(
@@ -81,6 +86,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Returns a single book', status: HttpStatus.OK, type: BookDetailsResponseEntity })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
     @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id')
     @UseGuards(AccessTokenGuard)
@@ -93,6 +99,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Returns a single page', status: HttpStatus.OK, type: BookPageResponseEntity })
     @ApiResponse({ description: 'Book page not found', status: HttpStatus.NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
     @Get(':id/pages/:pageId')
     @UseGuards(AccessTokenGuard)
     public readPage(
@@ -104,6 +111,7 @@ export class BooksController {
 
     @ApiResponse({ description: 'Changes last read page', status: HttpStatus.OK })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
+    @HttpCode(HttpStatus.OK)
     @Patch(':id/pages')
     @UseGuards(AccessTokenGuard)
     public changeLastReadPage(
