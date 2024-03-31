@@ -5,15 +5,23 @@ import { CreateCollectionDto, UpdateCollectionDto } from '../dtos';
 import { IUser } from '@app/users/lib/interfaces';
 import { CollectionAlreadyExistsException, CollectionNotFoundException } from '@app/common/lib/exceptions';
 import { PromiseGenericResponse } from '@app/common/lib/types';
-import { UTILS_SERVICE, UtilsService } from '@app/utils';
 import { CollectionDetailsResponseEntity, CollectionResponseEntity } from '../response-entities';
+import { REDIS_HELPER_SERVICE, REDIS_SERVICE } from '@app/redis/lib/constants';
+import { RedisHelperService, RedisService } from '@app/redis';
+import { PaginationService } from '@app/utils';
+import { PaginationQueryDto } from '@app/common';
+import { FindAllCollections } from '../types';
+import { RedisTTL } from '@app/redis/lib/enums';
 
 @Injectable()
-export class CollectionService {
+export class CollectionService extends PaginationService<ICollection> {
     public constructor(
         @Inject(COLLECTION_REPOSITORY) private readonly collectionRepository: ICollectionRepository,
-        @Inject(UTILS_SERVICE) private readonly utilsService: UtilsService,
-    ) {}
+        @Inject(REDIS_SERVICE) private readonly redisService: RedisService,
+        @Inject(REDIS_HELPER_SERVICE) private readonly redisHelperService: RedisHelperService,
+    ) {
+        super();
+    }
 
     public async createCollection(
         createCollectionDto: CreateCollectionDto,
@@ -54,12 +62,36 @@ export class CollectionService {
         return { status: HttpStatus.OK, message: 'Collection has updated!' };
     }
 
-    public async findAllCollection(currentUser: IUser): PromiseGenericResponse<{ collections: Array<ICollection> }> {
-        const collections = await this.findAll(currentUser);
+    public async findAllCollection(
+        currentUser: IUser,
+        paginatonQueryDto: PaginationQueryDto,
+    ): PromiseGenericResponse<FindAllCollections> {
+        const { skip, take } = this.getPaginationProps(paginatonQueryDto);
 
-        const serializedCollections = this.serializeCollections(collections);
+        const cacheKey = this.redisHelperService.generateCollectionsCache(currentUser.id);
+        const cacheExists = await this.redisService.get(cacheKey);
 
-        return { status: HttpStatus.OK, body: { collections: serializedCollections } };
+        if (cacheExists) {
+            const parsedData: FindAllCollections = JSON.parse(cacheExists);
+            return { status: HttpStatus.OK, body: { ...parsedData } };
+        }
+
+        const [collections, collectionsCount] = await this.findAllAndCount(currentUser);
+
+        const { items, pageInfo } = this.paginate(
+            { items: collections, totalCount: collectionsCount },
+            { page: skip, currentPage: paginatonQueryDto.page, pageSize: take },
+        );
+
+        const serializedCollections = this.serializeCollections(items);
+
+        await this.redisService.set(
+            cacheKey,
+            JSON.stringify({ collections: serializedCollections, pageInfo }),
+            RedisTTL.ONE_MINUTE,
+        );
+
+        return { status: HttpStatus.OK, body: { collections: serializedCollections, pageInfo } };
     }
 
     public async findCollectionDetails(
@@ -121,7 +153,7 @@ export class CollectionService {
         return this.collectionRepository.update({ id, user }, collection);
     }
 
-    public findAll(user: IUser) {
-        return this.collectionRepository.findAll({ where: { user } });
+    public findAllAndCount(user: IUser) {
+        return this.collectionRepository.findAllAndCount({ where: { user } });
     }
 }

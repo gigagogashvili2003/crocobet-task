@@ -12,13 +12,18 @@ import { PaginationService, UTILS_SERVICE, UtilsService } from '@app/utils';
 import { BookResponseEntity } from '../response-entities';
 import { IPageInfo, PaginationProps, PaginationQueryDto } from '@app/common';
 import { BookDetailsResponseEntity } from '../response-entities/book-details-response.entity';
+import { RedisHelperService, RedisService } from '@app/redis';
+import { REDIS_HELPER_SERVICE, REDIS_SERVICE } from '@app/redis/lib/constants';
+import { RedisTTL } from '@app/redis/lib/enums';
+import { FindAllBooks } from '../types';
 
 @Injectable()
 export class BookService extends PaginationService<IBook> {
     public constructor(
         @Inject(BOOK_REPOSITORY) private readonly bookRepository: IBookRepository,
         @Inject(BOOK_PAGE_SERVICE) private readonly bookPageService: BookPageService,
-        @Inject(UTILS_SERVICE) private readonly utilsService: UtilsService,
+        @Inject(REDIS_SERVICE) private readonly redisService: RedisService,
+        @Inject(REDIS_HELPER_SERVICE) private readonly redisHelperService: RedisHelperService,
     ) {
         super();
     }
@@ -55,8 +60,16 @@ export class BookService extends PaginationService<IBook> {
     public async findAllBook(
         user: IUser,
         paginationQueryDto: PaginationQueryDto,
-    ): PromiseGenericResponse<{ books: Array<IBook>; pageInfo: IPageInfo }> {
+    ): PromiseGenericResponse<FindAllBooks> {
         const { skip, take } = this.getPaginationProps(paginationQueryDto);
+
+        const cacheKey = this.redisHelperService.generateBookCacheKey(user.id);
+        const cacheExists = await this.redisService.get(cacheKey);
+
+        if (cacheExists) {
+            const parsedData: FindAllBooks = JSON.parse(cacheExists);
+            return { status: HttpStatus.OK, body: { ...parsedData } };
+        }
 
         const [books, booksCount] = await this.findAllAndCount(user, { skip, take });
 
@@ -66,6 +79,12 @@ export class BookService extends PaginationService<IBook> {
         );
 
         const serializedBooks = this.serialize(items);
+
+        await this.redisService.set(
+            cacheKey,
+            JSON.stringify({ books: serializedBooks, pageInfo }),
+            RedisTTL.ONE_MINUTE,
+        );
 
         return { status: HttpStatus.OK, body: { books: serializedBooks, pageInfo } };
     }
