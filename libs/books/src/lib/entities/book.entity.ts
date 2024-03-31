@@ -22,7 +22,7 @@ export class Book extends BaseEntity {
     @OneToMany(() => BookPage, (page) => page.book, { cascade: true })
     pages: BookPage[];
 
-    @OneToOne(() => BookPage, { lazy: true, nullable: true })
+    @OneToOne(() => BookPage, { nullable: true })
     @JoinColumn({ name: 'last_read_page_id' })
-    lastReadPage: Promise<BookPage>;
+    lastReadPage: BookPage;
 }

@@ -133,7 +133,11 @@ export class BookService extends PaginationService<IBook> {
     }
 
     public findAllAndCount(user: IUser, pagination: PaginationProps) {
-        return this.bookRepository.findAllAndCount({ where: { user }, ...pagination });
+        return this.bookRepository.findAllAndCount({
+            where: { user },
+            relations: { lastReadPage: true },
+            ...pagination,
+        });
     }
 
     public findOneByName(name: string, user: IUser) {
@@ -143,7 +147,7 @@ export class BookService extends PaginationService<IBook> {
     public findOneWithRelations(id: number, user: IUser) {
         return this.bookRepository.findOneByCondition({
             where: { id, user },
-            relations: { pages: true, collectionBooks: true, user: true },
+            relations: { lastReadPage: true, pages: true, collectionBooks: true, user: true },
         });
     }
 

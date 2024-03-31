@@ -93,7 +93,7 @@ export class AuthService {
 
         await Promise.all([
             this.redisService.set(key, otp, RedisTTL.FIVE_MINUTE),
-            this.mailSenderService.sendEmail('thegogashvili@gmail.com', 'Account Verification', otp.toString()),
+            this.mailSenderService.sendEmail(email, 'Account Verification', otp.toString()),
         ]);
 
         return { status: HttpStatus.OK, message: 'Otp has sent to the email!' };
