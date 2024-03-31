@@ -8,6 +8,7 @@ import { BookDetailsResponseEntity } from '@app/books/lib/response-entities/book
 import { BookIdSchema, UpdateBookSchema, createBookSchema } from '@app/books/lib/schemas';
 import { BookService } from '@app/books/lib/services';
 import { AccessTokenGuard, PaginationQueryDto } from '@app/common';
+import { ThrottlerConfig } from '@app/common/lib/config';
 import { CurrentUser } from '@app/common/lib/decorators';
 import { JoiValidationPipe } from '@app/common/lib/pipes';
 import { PaginationQuerySchema } from '@app/common/lib/schema';
@@ -29,6 +30,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiBearerAuth()
 @ApiTags('Books')
@@ -36,6 +38,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class BooksController {
     public constructor(@Inject(BOOK_SERVICE) private readonly bookService: BookService) {}
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Creates new book', status: HttpStatus.CREATED })
     @ApiResponse({ description: 'Book already exists', status: HttpStatus.CONFLICT })
     @HttpCode(HttpStatus.CREATED)
@@ -48,6 +51,7 @@ export class BooksController {
         return this.bookService.createBook(createBookDto, currentUser);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @ApiResponse({ description: 'Deletes a single book', status: HttpStatus.OK })
     @HttpCode(HttpStatus.OK)
@@ -60,6 +64,7 @@ export class BooksController {
         return this.bookService.deleteBook(params.id, currentUser);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Updates a book', status: HttpStatus.OK })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @HttpCode(HttpStatus.OK)
@@ -73,6 +78,7 @@ export class BooksController {
         return this.bookService.updateBook(params.id, updateBookDto, currentUser);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Returns all book', status: HttpStatus.OK, type: [BookResponseEntity] })
     @UseInterceptors(ClassSerializerInterceptor)
     @HttpCode(HttpStatus.OK)
@@ -85,6 +91,7 @@ export class BooksController {
         return this.bookService.findAllBook(user, paginationQueryDto);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Returns a single book', status: HttpStatus.OK, type: BookDetailsResponseEntity })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @HttpCode(HttpStatus.OK)
@@ -98,6 +105,7 @@ export class BooksController {
         return this.bookService.findBookDetails(params.id, currentUser);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Returns a single page', status: HttpStatus.OK, type: BookPageResponseEntity })
     @ApiResponse({ description: 'Book page not found', status: HttpStatus.NOT_FOUND })
     @HttpCode(HttpStatus.OK)
@@ -110,6 +118,7 @@ export class BooksController {
         return this.bookService.readPage(params.id, params.pageId, currentUser);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @Post(':id')
     public addPage(
         @Param(new JoiValidationPipe(BookIdSchema)) params: BookIdDto,
@@ -119,6 +128,7 @@ export class BooksController {
         return this.bookService.addPage(params.id, currentUser, createBookPageDto);
     }
 
+    @Throttle(ThrottlerConfig.SHORT)
     @ApiResponse({ description: 'Changes last read page', status: HttpStatus.OK })
     @ApiResponse({ description: 'Book not found', status: HttpStatus.NOT_FOUND })
     @HttpCode(HttpStatus.OK)
