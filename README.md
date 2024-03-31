@@ -20,6 +20,11 @@ The `BookPage` entity represents the pages of a book. It stores the content of e
 The `BookPageRead` entity tracks the last page read by a user for each book. It records the user's progress within a book, storing the user, the book, and the last read page. This enables users to resume reading from where they left off.
 
 
+![image](https://github.com/gigagogashvili2003/crocobet-task/assets/75528697/046bdd8c-c06d-4e9a-a6df-b92998422c8f)
+
+
+
+
 ```dbdiagram
 Table users {
   id int [pk]
