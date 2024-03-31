@@ -1,4 +1,3 @@
-
 ## Running the Project
 
 ### Prerequisites
@@ -25,13 +24,16 @@
 4. **Access the Application:**
     Once Docker Compose has finished setting up the containers, you can access the application by navigating to [http://localhost](http://localhost) in your web browser.
 
-5. **Stopping the Application:**
+5. **Postman Collection:**
+    You can find the Postman collection for this project [here](https://api.postman.com/collections/27198961-5c306144-37ca-4659-a9c1-b066c24dffdc?access_key=PMAT-01HTB0RC81Y5TGE9SW71JABNCC).
+
+6. **Stopping the Application:**
     To stop the application and remove the containers, you can use the following command:
     ```bash
     docker-compose down
     ```
 
-6. **Cleanup:**
+7. **Cleanup:**
     Optionally, you can remove any dangling Docker images and volumes using the following commands:
     ```bash
     docker image prune
