@@ -1,5 +1,7 @@
+import { PageIdDto } from '@app/book-pages/lib/dtos';
+import { PageIdSchema } from '@app/book-pages/lib/schemas';
 import { BOOK_SERVICE } from '@app/books/lib/constants';
-import { CreateBookDto, DeleteBookParamDto } from '@app/books/lib/dtos';
+import { BookIdDto, CreateBookDto, DeleteBookParamDto } from '@app/books/lib/dtos';
 import { BookIdSchema, createBookSchema } from '@app/books/lib/schemas';
 import { BookService } from '@app/books/lib/services';
 import { AccessTokenGuard, PaginationQueryDto } from '@app/common';
@@ -60,5 +62,14 @@ export class BooksController {
         @CurrentUser() currentUser: IUser,
     ) {
         return this.bookService.findBookDetails(params.id, currentUser);
+    }
+
+    @Get(':id/pages/:pageId')
+    @UseGuards(AccessTokenGuard)
+    public readPage(
+        @Param(new JoiValidationPipe(BookIdSchema.concat(PageIdSchema))) params: BookIdDto & PageIdDto,
+        @CurrentUser() currentUser: IUser,
+    ) {
+        return this.bookService.readPage(params.id, params.pageId, currentUser);
     }
 }

@@ -9,7 +9,19 @@ import { CurrentUser } from '@app/common/lib/decorators';
 import { JoiValidationPipe } from '@app/common/lib/pipes';
 import { PaginationQuerySchema } from '@app/common/lib/schema';
 import { IUser } from '@app/users/lib/interfaces';
-import { Body, Controller, Delete, Get, Inject, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    ClassSerializerInterceptor,
+    Controller,
+    Delete,
+    Get,
+    Inject,
+    Param,
+    Post,
+    Query,
+    UseGuards,
+    UseInterceptors,
+} from '@nestjs/common';
 
 @Controller('collection-books')
 export class CollectionBooksController {
@@ -38,6 +50,7 @@ export class CollectionBooksController {
         return this.collectionBookService.removeBook(params.id, deleteBookFromCollectionDto, currentUser);
     }
 
+    @UseInterceptors(ClassSerializerInterceptor)
     @Get(':id/books')
     @UseGuards(AccessTokenGuard)
     public findAllBook(

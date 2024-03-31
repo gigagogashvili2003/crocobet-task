@@ -13,3 +13,4 @@ export * from './book-not-found.exception';
 export * from './book-already-exists.exception';
 export * from './book-already-exists-in-collection.exeception';
 export * from './book-not-found-in-collection.exception';
+export * from './book-page-not-found.exception';

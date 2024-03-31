@@ -17,6 +17,7 @@ import {
 import { PromiseGenericResponse } from '@app/common/lib/types';
 import { PaginationService, UTILS_SERVICE, UtilsService } from '@app/utils';
 import { IPageInfo, PaginationProps, PaginationQueryDto } from '@app/common';
+import { CollectionBookResponseEntity } from '../response-entities';
 
 @Injectable()
 export class CollectionBookService extends PaginationService<ICollectionBook> {
@@ -79,7 +80,7 @@ export class CollectionBookService extends PaginationService<ICollectionBook> {
         id: number,
         currentUser: IUser,
         paginationQueryDto: PaginationQueryDto,
-    ): PromiseGenericResponse<{ collectionBooks: ICollectionBook[]; pageInfo: IPageInfo }> {
+    ): PromiseGenericResponse<{ books: ICollectionBook[]; pageInfo: IPageInfo }> {
         const { skip, take } = this.getPaginationProps(paginationQueryDto);
 
         const collection = await this.collectionService.checkIfCollectionExists(id, currentUser);
@@ -91,11 +92,17 @@ export class CollectionBookService extends PaginationService<ICollectionBook> {
             { page: skip, currentPage: paginationQueryDto.page, pageSize: take },
         );
 
+        const serializedCollectionBooks = this.serialize(items);
+
         return {
             status: HttpStatus.CREATED,
             message: 'Book has deleted from the collection',
-            body: { collectionBooks: items, pageInfo },
+            body: { books: serializedCollectionBooks, pageInfo },
         };
+    }
+
+    public serialize(collectionBooks: ICollectionBook[]) {
+        return collectionBooks.map((collectionBook) => new CollectionBookResponseEntity(collectionBook));
     }
 
     public createAndSave(collectionBook: Partial<ICollectionBook>) {

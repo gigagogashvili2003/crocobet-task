@@ -78,6 +78,24 @@ export class BookService extends PaginationService<IBook> {
         return { status: HttpStatus.OK, body: { book: serializedBookDetails } };
     }
 
+    public async readPage(
+        bookId: number,
+        pageId: number,
+        currentUser: IUser,
+    ): PromiseGenericResponse<{ page: IBookPage }> {
+        const book = await this.checkIfBookExists(bookId, currentUser);
+
+        console.log(book);
+
+        const page = await this.bookPageService.checkIfPageExists(pageId, book);
+
+        const serializedPage = this.bookPageService.serialize(page);
+
+        await this.update(book.id, currentUser, { lastReadPage: page });
+
+        return { status: HttpStatus.OK, body: { page: serializedPage } };
+    }
+
     public async checkIfBookExists(id: number, user: IUser, withRelations?: boolean) {
         let book: IBook = null;
 
@@ -119,6 +137,10 @@ export class BookService extends PaginationService<IBook> {
             where: { id, user },
             relations: { lastReadPage: true, pages: true, collectionBooks: true, user: true },
         });
+    }
+
+    public update(id: number, user: IUser, data: Partial<IBook>) {
+        return this.bookRepository.update({ id, user }, data);
     }
 
     public createAndSave(book: Partial<IBook>) {
