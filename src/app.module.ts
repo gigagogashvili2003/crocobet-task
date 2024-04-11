@@ -17,6 +17,7 @@ import { CollectionsModule } from './collections/collections.module';
 import { BooksModule } from './books/books.module';
 import { CollectionBooksModule } from './collection-books/collection-books.module';
 import { TerminusModule } from '@nestjs/terminus';
+import { ChatModule } from '@app/chat';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { TerminusModule } from '@nestjs/terminus';
         CollectionsModule,
         BooksModule,
         CollectionBooksModule,
+        ChatModule,
     ],
     controllers: [AppController],
     providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

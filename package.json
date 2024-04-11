@@ -26,10 +26,12 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.3.7",
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/terminus": "^10.2.3",
     "@nestjs/throttler": "^5.1.2",
     "@nestjs/typeorm": "^10.0.2",
+    "@nestjs/websockets": "^10.3.7",
     "aws-sdk": "^2.1589.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -103,7 +105,8 @@
       "^@app/notifications(|/.*)$": "<rootDir>/libs/notifications/src/$1",
       "^@app/book-pages(|/.*)$": "<rootDir>/libs/book-pages/src/$1",
       "^@app/collection-books(|/.*)$": "<rootDir>/libs/collection-books/src/$1",
-      "^@app/book-page-reads(|/.*)$": "<rootDir>/libs/book-page-reads/src/$1"
+      "^@app/book-page-reads(|/.*)$": "<rootDir>/libs/book-page-reads/src/$1",
+      "^@app/chat(|/.*)$": "<rootDir>/libs/chat/src/$1"
     }
   }
 }
