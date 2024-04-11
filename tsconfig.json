@@ -1,49 +1,107 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "declaration": true,
-        "removeComments": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "allowSyntheticDefaultImports": true,
-        "target": "ES2021",
-        "sourceMap": true,
-        "outDir": "./dist",
-        "baseUrl": "./",
-        "incremental": true,
-        "skipLibCheck": true,
-        "strictNullChecks": false,
-        "noImplicitAny": false,
-        "strictBindCallApply": false,
-        "forceConsistentCasingInFileNames": false,
-        "noFallthroughCasesInSwitch": false,
-        "paths": {
-            "@app/users": ["libs/users/src"],
-            "@app/users/*": ["libs/users/src/*"],
-            "@app/auth": ["libs/auth/src"],
-            "@app/auth/*": ["libs/auth/src/*"],
-            "@app/collections": ["libs/collections/src"],
-            "@app/collections/*": ["libs/collections/src/*"],
-            "@app/common": ["libs/common/src"],
-            "@app/common/*": ["libs/common/src/*"],
-            "@app/utils": ["libs/utils/src"],
-            "@app/utils/*": ["libs/utils/src/*"],
-            "@app/redis": ["libs/redis/src"],
-            "@app/redis/*": ["libs/redis/src/*"],
-            "@app/sessions": ["libs/sessions/src"],
-            "@app/sessions/*": ["libs/sessions/src/*"],
-            "@app/books": ["libs/books/src"],
-            "@app/books/*": ["libs/books/src/*"],
-            "@app/db": ["libs/db/src"],
-            "@app/db/*": ["libs/db/src/*"],
-            "@app/notifications": ["libs/notifications/src"],
-            "@app/notifications/*": ["libs/notifications/src/*"],
-            "@app/book-pages": ["libs/book-pages/src"],
-            "@app/book-pages/*": ["libs/book-pages/src/*"],
-            "@app/collection-books": ["libs/collection-books/src"],
-            "@app/collection-books/*": ["libs/collection-books/src/*"],
-            "@app/book-page-reads": ["libs/book-page-reads/src"],
-            "@app/book-page-reads/*": ["libs/book-page-reads/src/*"]
-        }
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/users": [
+        "libs/users/src"
+      ],
+      "@app/users/*": [
+        "libs/users/src/*"
+      ],
+      "@app/auth": [
+        "libs/auth/src"
+      ],
+      "@app/auth/*": [
+        "libs/auth/src/*"
+      ],
+      "@app/collections": [
+        "libs/collections/src"
+      ],
+      "@app/collections/*": [
+        "libs/collections/src/*"
+      ],
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+      ],
+      "@app/utils": [
+        "libs/utils/src"
+      ],
+      "@app/utils/*": [
+        "libs/utils/src/*"
+      ],
+      "@app/redis": [
+        "libs/redis/src"
+      ],
+      "@app/redis/*": [
+        "libs/redis/src/*"
+      ],
+      "@app/sessions": [
+        "libs/sessions/src"
+      ],
+      "@app/sessions/*": [
+        "libs/sessions/src/*"
+      ],
+      "@app/books": [
+        "libs/books/src"
+      ],
+      "@app/books/*": [
+        "libs/books/src/*"
+      ],
+      "@app/db": [
+        "libs/db/src"
+      ],
+      "@app/db/*": [
+        "libs/db/src/*"
+      ],
+      "@app/notifications": [
+        "libs/notifications/src"
+      ],
+      "@app/notifications/*": [
+        "libs/notifications/src/*"
+      ],
+      "@app/book-pages": [
+        "libs/book-pages/src"
+      ],
+      "@app/book-pages/*": [
+        "libs/book-pages/src/*"
+      ],
+      "@app/collection-books": [
+        "libs/collection-books/src"
+      ],
+      "@app/collection-books/*": [
+        "libs/collection-books/src/*"
+      ],
+      "@app/book-page-reads": [
+        "libs/book-page-reads/src"
+      ],
+      "@app/book-page-reads/*": [
+        "libs/book-page-reads/src/*"
+      ],
+      "@app/chat": [
+        "libs/chat/src"
+      ],
+      "@app/chat/*": [
+        "libs/chat/src/*"
+      ]
     }
+  }
 }

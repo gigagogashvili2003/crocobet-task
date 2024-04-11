@@ -10,6 +10,10 @@ export class JwtLibService {
         private readonly configService: ConfigService,
     ) {}
 
+    public async verifyToken(token: string, key: string) {
+        return this.jwtService.verify(token, { publicKey: key });
+    }
+
     public async sign<P extends Object | Buffer>(payload: P, type: Token = Token.ACCESS_TOKEN): Promise<string> {
         try {
             let token: string;
